@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SearchComponent from "./components/SearchFlights";
+import SearchComponent from "./components/search";
 
 export default function Home() {
   return (
