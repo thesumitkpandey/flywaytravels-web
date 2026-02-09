@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { CabinClass, Location } from "@/types/flight";
 
 interface FlightSearchState {
-    from?: Location;
-    to?: Location;
+    departureLocation?: Location;
+    destinationLocation?: Location;
     journeyDate: Date | null;
     returnDate: Date | null;
     isRoundTrip: boolean;
@@ -12,8 +12,8 @@ interface FlightSearchState {
     adultCount : number;
     cabinClass : CabinClass;
 
-    setFrom: (from: Location) => void;
-    setTo: (to: Location) => void;
+    setDepartureLocation: (from: Location) => void;
+    setDestinationLocation: (to: Location) => void;
     setJourneyDate: (date: Date | null) => void;
     setReturnDate: (date: Date | null) => void;
     setIsRoundTrip: (value: boolean) => void;
@@ -25,8 +25,8 @@ interface FlightSearchState {
 
 export const useFlightSearchStore = create<FlightSearchState>((set) => ({
     //States
-    from: undefined,
-    to: undefined,
+    departureLocation: {iataCode: "DEL", cityName: "Delhi", airportName: "Indira Gandhi International Airport"},
+    destinationLocation: {iataCode: "BOM", cityName: "Mumbai", airportName: "Chhatrapati Shivaji Maharaj International Airport"},
     journeyDate: null,
     returnDate: null,
     isRoundTrip: false,
@@ -35,8 +35,8 @@ export const useFlightSearchStore = create<FlightSearchState>((set) => ({
     adultCount : 0,
     cabinClass : CabinClass.ECONOMY,
     //SetStates
-    setFrom: (from) => set({ from }),
-    setTo: (to) => set({ to }),
+    setDepartureLocation: (departureLocation) => set({ departureLocation }),
+    setDestinationLocation: (destinationLocation) => set({ destinationLocation }),
     setJourneyDate: (journeyDate) => set({ journeyDate }),
     setReturnDate: (returnDate) => set({ returnDate }),
     setIsRoundTrip: (value) => set({ isRoundTrip: value }),
