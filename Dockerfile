@@ -1,33 +1,39 @@
-# ---------- 1️⃣ Build Stage ----------
+# ---------- Stage 1: Build ----------
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files first (for layer caching)
-COPY package.json package-lock.json* ./
+# Install pnpm
+RUN corepack enable
 
-RUN npm install
+# Copy package files first (for caching)
+COPY package.json pnpm-lock.yaml ./
 
-# Copy rest of the app
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy rest of project
 COPY . .
 
 # Build Next.js app
-RUN npm run build
+RUN pnpm build
 
-
-# ---------- 2️⃣ Production Stage ----------
+# ---------- Stage 2: Production ----------
 FROM node:20-alpine
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+RUN corepack enable
 
-# Only copy necessary files from builder
+# Copy only necessary files from builder
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
+
+# Install only production deps
+RUN pnpm install --prod --frozen-lockfile
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
