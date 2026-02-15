@@ -162,7 +162,7 @@ const FlightSearchComponent = () => {
               setDepartureSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
           />
           {showDepartureDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -193,12 +193,12 @@ const FlightSearchComponent = () => {
         <div className="col-span-12 md:col-span-1 flex items-end justify-center pb-3">
           <button
             onClick={handleSwapLocations}
-            className="p-2 rounded-full border-2 border-blue-500 bg-white hover:bg-blue-50 transition-colors"
+            className="p-2 rounded-full border-2 border-primary bg-white hover:bg-blue-50 transition-colors"
             aria-label="Swap locations"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-blue-500"
+              className="h-5 w-5 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -225,7 +225,7 @@ const FlightSearchComponent = () => {
               setDestinationSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
           />
           {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -254,12 +254,12 @@ const FlightSearchComponent = () => {
 
         {/* Departure Date */}
         <div className="col-span-12 md:col-span-2">
-          <label className="block text-sm text-gray-600 mb-1">Depart</label>
+          <label className="block text-sm text-black mb-1">Depart</label>
           <input
             type="date"
             value={journeyDate ? format(journeyDate, "yyyy-MM-dd") : ""}
             onChange={(e) => setJourneyDate(e.target.value ? new Date(e.target.value) : null)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
           />
         </div>
 
@@ -281,7 +281,7 @@ const FlightSearchComponent = () => {
           <div className="col-span-12 md:col-span-2 flex items-end">
             <button
               onClick={() => setIsRoundTrip(true)}
-              className="w-full px-4 py-3 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+              className="w-full px-4 py-3 text-black hover:bg-blue-50 rounded-lg transition-colors font-medium"
             >
               Add Return
             </button>
