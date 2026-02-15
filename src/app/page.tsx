@@ -402,14 +402,14 @@ const FlightSearchComponent = () => {
           )}
         </div>
 
+
+      </div>
         {/* Search Button */}
-        <div className="col-span-12 md:col-span-2 flex items-end">
-          <button className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+<div className=" w-full justify-end mt-4  flex">
+          <button className="w-40 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
             Search Flights
           </button>
         </div>
-      </div>
-
     </div>
   );
 };
