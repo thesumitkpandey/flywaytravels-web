@@ -4,18 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useFlightSearchStore } from "@/store/search.store";
 import { Location, CabinClass } from "@/types/flight";
 import { format } from "date-fns";
+import axiosInstance from "@/provider/axios";
 
-// Mock airport data - replace with actual API call
-const AIRPORTS: Location[] = [
-  { iataCode: "DEL", cityName: "Delhi", airportName: "Indira Gandhi International Airport" },
-  { iataCode: "BOM", cityName: "Mumbai", airportName: "Chhatrapati Shivaji Maharaj International Airport" },
-  { iataCode: "BLR", cityName: "Bangalore", airportName: "Kempegowda International Airport" },
-  { iataCode: "MAA", cityName: "Chennai", airportName: "Chennai International Airport" },
-  { iataCode: "HYD", cityName: "Hyderabad", airportName: "Rajiv Gandhi International Airport" },
-  { iataCode: "CCU", cityName: "Kolkata", airportName: "Netaji Subhas Chandra Bose International Airport" },
-  { iataCode: "GOI", cityName: "Goa", airportName: "Goa International Airport" },
-  { iataCode: "AMD", cityName: "Ahmedabad", airportName: "Sardar Vallabhbhai Patel International Airport" },
-];
 
 const FlightSearchComponent = () => {
   const {
@@ -39,10 +29,13 @@ const FlightSearchComponent = () => {
     setCabinClass,
   } = useFlightSearchStore();
 
+  const [departureAirports, setDepartureAirports] = useState<Location[]>([]);
+  const [destinationAirports, setDestinationAirports] = useState<Location[]>([]);
+  const [loadingAirports, setLoadingAirports] = useState(false);
+
   const [showDepartureDropdown, setShowDepartureDropdown] = useState(false);
   const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
-  const [showNonStop, setShowNonStop] = useState(false);
 
   const [departureSearch, setDepartureSearch] = useState("");
   const [destinationSearch, setDestinationSearch] = useState("");
@@ -50,6 +43,27 @@ const FlightSearchComponent = () => {
   const departureRef = useRef<HTMLDivElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
   const passengerRef = useRef<HTMLDivElement>(null);
+  const fetchAirports = async (keyword: string, type: "departure" | "destination") => {
+    if (!keyword) return;
+
+    try {
+      setLoadingAirports(true);
+
+      const res = await axiosInstance.get("/airports/search", {
+        params: { keyword },
+      });
+
+      if (type === "departure") {
+        setDepartureAirports(res.data);
+      } else {
+        setDestinationAirports(res.data);
+      }
+    } catch (error) {
+      console.error("Airport fetch error:", error);
+    } finally {
+      setLoadingAirports(false);
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -69,19 +83,23 @@ const FlightSearchComponent = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredDepartureAirports = AIRPORTS.filter(
-    (airport) =>
-      airport.cityName.toLowerCase().includes(departureSearch.toLowerCase()) ||
-      airport.iataCode.toLowerCase().includes(departureSearch.toLowerCase()) ||
-      airport.airportName.toLowerCase().includes(departureSearch.toLowerCase())
-  );
 
-  const filteredDestinationAirports = AIRPORTS.filter(
-    (airport) =>
-      airport.cityName.toLowerCase().includes(destinationSearch.toLowerCase()) ||
-      airport.iataCode.toLowerCase().includes(destinationSearch.toLowerCase()) ||
-      airport.airportName.toLowerCase().includes(destinationSearch.toLowerCase())
-  );
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchAirports(departureSearch, "departure");
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [departureSearch]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchAirports(destinationSearch, "destination");
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [destinationSearch]);
+
 
   const handleSwapLocations = () => {
     const temp = departureLocation;
@@ -148,7 +166,7 @@ const FlightSearchComponent = () => {
           />
           {showDepartureDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {filteredDepartureAirports.map((airport) => (
+              {departureAirports.map((airport) => (
                 <div
                   key={airport.iataCode}
                   onClick={() => {
@@ -164,7 +182,7 @@ const FlightSearchComponent = () => {
                   <div className="text-sm text-gray-600">{airport.airportName}</div>
                 </div>
               ))}
-              {filteredDepartureAirports.length === 0 && (
+              {!loadingAirports && departureAirports.length === 0 && (
                 <div className="px-4 py-3 text-gray-500">No airports found</div>
               )}
             </div>
@@ -211,7 +229,7 @@ const FlightSearchComponent = () => {
           />
           {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {filteredDestinationAirports.map((airport) => (
+              {destinationAirports.map((airport) => (
                 <div
                   key={airport.iataCode}
                   onClick={() => {
@@ -227,7 +245,7 @@ const FlightSearchComponent = () => {
                   <div className="text-sm text-gray-600">{airport.airportName}</div>
                 </div>
               ))}
-              {filteredDestinationAirports.length === 0 && (
+              {!loadingAirports && destinationAirports.length === 0 && (
                 <div className="px-4 py-3 text-gray-500">No airports found</div>
               )}
             </div>
@@ -404,12 +422,12 @@ const FlightSearchComponent = () => {
 
 
       </div>
-        {/* Search Button */}
-<div className=" w-full justify-end mt-4  flex">
-          <button className="w-40 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
-            Search Flights
-          </button>
-        </div>
+      {/* Search Button */}
+      <div className=" w-full justify-end mt-4  flex">
+        <button className="w-40 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+          Search
+        </button>
+      </div>
     </div>
   );
 };
