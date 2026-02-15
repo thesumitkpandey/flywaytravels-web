@@ -131,7 +131,7 @@ const FlightSearchComponent = () => {
       </div>
 
       {/* Main Search Form */}
-      <div className="grid grid-cols-12 gap-4 mb-4">
+      <div className="grid grid-cols-14 gap-4 mb-4">
         {/* From - Departure Location */}
         <div className="col-span-12 md:col-span-3 relative" ref={departureRef}>
           <label className="block text-sm text-gray-600 mb-1">From</label>
