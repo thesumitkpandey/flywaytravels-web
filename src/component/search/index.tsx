@@ -161,7 +161,7 @@ const FlightSearchComponent = () => {
               setDepartureSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-black"
           />
           {showDepartureDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -213,7 +213,7 @@ const FlightSearchComponent = () => {
               setDestinationSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-black"
           />
           {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -247,7 +247,7 @@ const FlightSearchComponent = () => {
             type="date"
             value={journeyDate ? format(journeyDate, "yyyy-MM-dd") : ""}
             onChange={(e) => setJourneyDate(e.target.value ? new Date(e.target.value) : null)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:black focus:border-transparent text-black"
           />
         </div>
 
@@ -259,7 +259,7 @@ const FlightSearchComponent = () => {
               type="date"
               value={returnDate ? format(returnDate, "yyyy-MM-dd") : ""}
               onChange={(e) => setReturnDate(e.target.value ? new Date(e.target.value) : null)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
         )}
@@ -281,9 +281,9 @@ const FlightSearchComponent = () => {
           <label className="block text-sm text-gray-600 mb-1">Passenger & Class</label>
           <button
             onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between overflow-hidden"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent flex items-center justify-between overflow-hidden"
           >
-            <span className="text-gray-900 truncate whitespace-nowrap">
+            <span className="text-black truncate whitespace-nowrap">
               {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
             </span>
 
@@ -310,14 +310,14 @@ const FlightSearchComponent = () => {
                   <button
                     onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
                     disabled={adultCount === 0}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     -
                   </button>
                   <span className="w-8 text-center font-medium">{adultCount}</span>
                   <button
                     onClick={() => setAdultCount(adultCount + 1)}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center text-black"
                   >
                     +
                   </button>
