@@ -387,7 +387,7 @@ const FlightSearchComponent = () => {
                       type="radio"
                       checked={cabinClass === CabinClass.ECONOMY}
                       onChange={() => setCabinClass(CabinClass.ECONOMY)}
-                      className="w-4 h-4 text-blue-500 accent-blue-500"
+                      className="w-4 h-4 text-black accent-black"
                     />
                     <span className="text-gray-700">Economy</span>
                   </label>
@@ -396,7 +396,7 @@ const FlightSearchComponent = () => {
                       type="radio"
                       checked={cabinClass === CabinClass.PREMIUM_ECONOMY}
                       onChange={() => setCabinClass(CabinClass.PREMIUM_ECONOMY)}
-                      className="w-4 h-4 text-blue-500 accent-blue-500"
+                      className="w-4 h-4 text-black accent-black"
                     />
                     <span className="text-gray-700">Premium Economy</span>
                   </label>
@@ -405,7 +405,7 @@ const FlightSearchComponent = () => {
                       type="radio"
                       checked={cabinClass === CabinClass.BUSINESS}
                       onChange={() => setCabinClass(CabinClass.BUSINESS)}
-                      className="w-4 h-4 text-blue-500 accent-blue-500"
+                      className="w-4 h-4 text-black accent-black"
                     />
                     <span className="text-gray-700">Business</span>
                   </label>
