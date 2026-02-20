@@ -190,28 +190,16 @@ const FlightSearchComponent = () => {
         </div>
 
         {/* Swap Button */}
-        <div className="col-span-12 md:col-span-1 flex items-end justify-center pb-3">
-          <button
-            onClick={handleSwapLocations}
-            className="p-2 rounded-full border-2 border-primary bg-white hover:bg-blue-50 transition-colors"
-            aria-label="Swap locations"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-primary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-              />
-            </svg>
-          </button>
-        </div>
+<div className="col-span-12 md:col-span-1 flex items-center justify-center mt-6">
+  <button
+    onClick={handleSwapLocations}
+    className="p-2 rounded-full border-2 border-primary bg-white hover:bg-blue-50 transition-colors"
+    aria-label="Swap locations"
+  >
+    ...
+  </button>
+</div>
+
 
         {/* To - Destination Location */}
         <div className="col-span-12 md:col-span-3 relative" ref={destinationRef}>
@@ -291,13 +279,14 @@ const FlightSearchComponent = () => {
         {/* Passenger & Class */}
         <div className="col-span-12 md:col-span-3 relative" ref={passengerRef}>
           <label className="block text-sm text-gray-600 mb-1">Passenger & Class</label>
-          <button
-            onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between"
-          >
-            <span className="text-gray-900">
-              {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
-            </span>
+<button
+  onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between overflow-hidden"
+>
+  <span className="text-gray-900 truncate whitespace-nowrap">
+    {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
+  </span>
+
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`h-5 w-5 text-gray-400 transition-transform ${showPassengerDropdown ? "rotate-180" : ""}`}
