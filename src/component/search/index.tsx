@@ -8,6 +8,9 @@ import axiosInstance from "@/provider/axios";
 import { ArrowLeftRight, Minus, Plus } from "lucide-react";
 import { Radio } from "antd";
 import type { RadioChangeEvent } from "antd";
+import { DatePicker } from "antd";
+import type { DatePickerProps } from "antd";
+import dayjs from "dayjs";
 
 
 const FlightSearchComponent = () => {
@@ -161,7 +164,7 @@ const FlightSearchComponent = () => {
               setDepartureSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-black"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-0 text-black transition-colors"
           />
           {showDepartureDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -213,7 +216,7 @@ const FlightSearchComponent = () => {
               setDestinationSearch("");
             }}
             placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-black"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-0 text-black transition-colors"
           />
           {showDestinationDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -243,24 +246,33 @@ const FlightSearchComponent = () => {
         {/* Departure Date */}
         <div className="col-span-12 md:col-span-2">
           <label className="block text-sm text-black mb-1">Depart</label>
-          <input
-            type="date"
-            value={journeyDate ? format(journeyDate, "yyyy-MM-dd") : ""}
-            onChange={(e) => setJourneyDate(e.target.value ? new Date(e.target.value) : null)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:black focus:border-transparent text-black"
+          <DatePicker
+            value={journeyDate ? dayjs(journeyDate) : null}
+            onChange={(date) => {
+              setJourneyDate(date ? date.toDate() : null);
+            }}
+            format="YYYY-MM-DD"
+            className="w-full h-[46px] !border !border-gray-300 !rounded-lg hover:!border-black focus:!border-black focus:!shadow-none"
           />
+
+
         </div>
 
         {/* Return Date (conditionally rendered) */}
         {isRoundTrip && (
           <div className="col-span-12 md:col-span-2">
             <label className="block text-sm text-gray-600 mb-1">Return</label>
-            <input
-              type="date"
-              value={returnDate ? format(returnDate, "yyyy-MM-dd") : ""}
-              onChange={(e) => setReturnDate(e.target.value ? new Date(e.target.value) : null)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            <DatePicker
+              value={returnDate ? dayjs(returnDate) : null}
+              onChange={(date) => {
+                setReturnDate(date ? date.toDate() : null);
+              }}
+              format="YYYY-MM-DD"
+              className="w-full h-[46px] !border !border-gray-300 !rounded-lg hover:!border-black focus:!border-black focus:!shadow-none"
             />
+
+
+
           </div>
         )}
 
@@ -281,7 +293,7 @@ const FlightSearchComponent = () => {
           <label className="block text-sm text-gray-600 mb-1">Passenger & Class</label>
           <button
             onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent flex items-center justify-between overflow-hidden"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:border-black focus:ring-0 hover:border-black transition-colors flex items-center justify-between overflow-hidden"
           >
             <span className="text-black truncate whitespace-nowrap">
               {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
@@ -419,7 +431,7 @@ const FlightSearchComponent = () => {
       </div>
       {/* Search Button */}
       <div className=" w-full justify-end mt-4  flex">
-        <button className="w-40 px-6 py-3 bg-primary hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+        <button className="w-40 px-6 py-3 bg-primary cursor-pointer text-white font-semibold rounded-lg transition-colors">
           Search
         </button>
       </div>
