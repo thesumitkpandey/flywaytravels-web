@@ -5,7 +5,7 @@ import { useFlightSearchStore } from "@/store/search.store";
 import { Location, CabinClass } from "@/types/flight";
 import { format } from "date-fns";
 import axiosInstance from "@/provider/axios";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Minus, Plus } from "lucide-react";
 import { Radio } from "antd";
 import type { RadioChangeEvent } from "antd";
 
@@ -312,14 +312,16 @@ const FlightSearchComponent = () => {
                     disabled={adultCount === 0}
                     className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    -
+                    <Minus className="h-4 w-4 text-black" />
                   </button>
-                  <span className="w-8 text-center font-medium">{adultCount}</span>
+
+                  <span className="w-8 text-center font-medium text-black">{adultCount}</span>
                   <button
                     onClick={() => setAdultCount(adultCount + 1)}
                     className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center text-black"
                   >
-                    +
+                    <Plus className="h-4 w-4 text-black" />
+
                   </button>
                 </div>
               </div>
@@ -334,16 +336,18 @@ const FlightSearchComponent = () => {
                   <button
                     onClick={() => childCount > 0 && setChildCount(childCount - 1)}
                     disabled={childCount === 0}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    -
+                    <Minus className="h-4 w-4 text-black" />
+
                   </button>
-                  <span className="w-8 text-center font-medium">{childCount}</span>
+                  <span className="w-8 text-center font-medium text-black">{childCount}</span>
                   <button
                     onClick={() => setChildCount(childCount + 1)}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center"
                   >
-                    +
+                    <Plus className="h-4 w-4 text-black" />
+
                   </button>
                 </div>
               </div>
@@ -358,16 +362,18 @@ const FlightSearchComponent = () => {
                   <button
                     onClick={() => infantCount > 0 && setInfantCount(infantCount - 1)}
                     disabled={infantCount === 0}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    -
+                    <Minus className="h-4 w-4 text-black" />
+
                   </button>
-                  <span className="w-8 text-center font-medium">{infantCount}</span>
+                  <span className="w-8 text-center font-medium text-black">{infantCount}</span>
                   <button
                     onClick={() => setInfantCount(infantCount + 1)}
-                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center"
                   >
-                    +
+                    <Plus className="h-4 w-4 text-black" />
+
                   </button>
                 </div>
               </div>
