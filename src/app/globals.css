@@ -26,3 +26,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.trip-type-radio .ant-radio-button-wrapper-checked {
+  background-color: black !important;
+  border-color: black !important;
+  color: white !important;
+}
+
+.trip-type-radio .ant-radio-button-wrapper-checked:hover {
+  background-color: black !important;
+  border-color: black !important;
+  color: white !important;
+}
+
+.trip-type-radio .ant-radio-button-wrapper:hover {
+  color: black;
+}

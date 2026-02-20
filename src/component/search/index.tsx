@@ -5,6 +5,9 @@ import { useFlightSearchStore } from "@/store/search.store";
 import { Location, CabinClass } from "@/types/flight";
 import { format } from "date-fns";
 import axiosInstance from "@/provider/axios";
+import { ArrowLeftRight } from "lucide-react";
+import { Radio } from "antd";
+import type { RadioChangeEvent } from "antd";
 
 
 const FlightSearchComponent = () => {
@@ -127,26 +130,22 @@ const FlightSearchComponent = () => {
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
       {/* Trip Type Selection */}
-      <div className="flex gap-6 mb-6">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="radio"
-            checked={!isRoundTrip}
-            onChange={() => setIsRoundTrip(false)}
-            className="w-5 h-5 text-blue-500 accent-blue-500"
-          />
-          <span className="text-gray-700 font-medium">One Way</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="radio"
-            checked={isRoundTrip}
-            onChange={() => setIsRoundTrip(true)}
-            className="w-5 h-5 text-blue-500 accent-blue-500"
-          />
-          <span className="text-gray-700 font-medium">Round Trip</span>
-        </label>
-      </div>
+<div className="mb-6">
+<Radio.Group
+  className="trip-type-radio"
+  value={isRoundTrip ? "ROUND_TRIP" : "ONE_WAY"}
+  onChange={(e: RadioChangeEvent) => {
+    setIsRoundTrip(e.target.value === "ROUND_TRIP");
+  }}
+  optionType="button"
+  buttonStyle="solid"
+>
+  <Radio.Button value="ONE_WAY">One Way</Radio.Button>
+  <Radio.Button value="ROUND_TRIP">Round Trip</Radio.Button>
+</Radio.Group>
+
+</div>
+
 
       {/* Main Search Form */}
       <div className="grid grid-cols-14 gap-4 mb-4">
@@ -193,12 +192,13 @@ const FlightSearchComponent = () => {
 <div className="col-span-12 md:col-span-1 flex items-center justify-center mt-6">
   <button
     onClick={handleSwapLocations}
-    className="p-2 rounded-full border-2 border-primary bg-white hover:bg-blue-50 transition-colors"
+    // className="p-3  bg-white hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
     aria-label="Swap locations"
   >
-    ...
+    <ArrowLeftRight className="h-5 w-5 text-primary" />
   </button>
 </div>
+
 
 
         {/* To - Destination Location */}
