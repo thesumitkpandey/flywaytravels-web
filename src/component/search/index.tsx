@@ -130,21 +130,21 @@ const FlightSearchComponent = () => {
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
       {/* Trip Type Selection */}
-<div className="mb-6">
-<Radio.Group
-  className="trip-type-radio"
-  value={isRoundTrip ? "ROUND_TRIP" : "ONE_WAY"}
-  onChange={(e: RadioChangeEvent) => {
-    setIsRoundTrip(e.target.value === "ROUND_TRIP");
-  }}
-  optionType="button"
-  buttonStyle="solid"
->
-  <Radio.Button value="ONE_WAY">One Way</Radio.Button>
-  <Radio.Button value="ROUND_TRIP">Round Trip</Radio.Button>
-</Radio.Group>
+      <div className="mb-6">
+        <Radio.Group
+          className="trip-type-radio"
+          value={isRoundTrip ? "ROUND_TRIP" : "ONE_WAY"}
+          onChange={(e: RadioChangeEvent) => {
+            setIsRoundTrip(e.target.value === "ROUND_TRIP");
+          }}
+          optionType="button"
+          buttonStyle="solid"
+        >
+          <Radio.Button value="ONE_WAY">One Way</Radio.Button>
+          <Radio.Button value="ROUND_TRIP">Round Trip</Radio.Button>
+        </Radio.Group>
 
-</div>
+      </div>
 
 
       {/* Main Search Form */}
@@ -189,15 +189,15 @@ const FlightSearchComponent = () => {
         </div>
 
         {/* Swap Button */}
-<div className="col-span-12 md:col-span-1 flex items-center justify-center mt-6">
-  <button
-    onClick={handleSwapLocations}
-    // className="p-3  bg-white hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
-    aria-label="Swap locations"
-  >
-    <ArrowLeftRight className="h-5 w-5 text-primary" />
-  </button>
-</div>
+        <div className="col-span-12 md:col-span-1 flex items-center justify-center mt-6">
+          <button
+            onClick={handleSwapLocations}
+            // className="p-3  bg-white hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
+            aria-label="Swap locations"
+          >
+            <ArrowLeftRight className="h-5 w-5 text-primary" />
+          </button>
+        </div>
 
 
 
@@ -279,13 +279,13 @@ const FlightSearchComponent = () => {
         {/* Passenger & Class */}
         <div className="col-span-12 md:col-span-3 relative" ref={passengerRef}>
           <label className="block text-sm text-gray-600 mb-1">Passenger & Class</label>
-<button
-  onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between overflow-hidden"
->
-  <span className="text-gray-900 truncate whitespace-nowrap">
-    {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
-  </span>
+          <button
+            onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between overflow-hidden"
+          >
+            <span className="text-gray-900 truncate whitespace-nowrap">
+              {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
+            </span>
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
