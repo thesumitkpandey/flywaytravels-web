@@ -11,7 +11,7 @@ import type { RadioChangeEvent } from "antd";
 import { DatePicker } from "antd";
 import type { DatePickerProps } from "antd";
 import dayjs from "dayjs";
-
+import { useRouter } from "next/navigation";
 
 const FlightSearchComponent = () => {
   const {
@@ -34,7 +34,7 @@ const FlightSearchComponent = () => {
     setAdultCount,
     setCabinClass,
   } = useFlightSearchStore();
-
+  const router = useRouter();
   const [departureAirports, setDepartureAirports] = useState<Location[]>([]);
   const [destinationAirports, setDestinationAirports] = useState<Location[]>([]);
   const [loadingAirports, setLoadingAirports] = useState(false);
@@ -129,6 +129,32 @@ const FlightSearchComponent = () => {
         return "Economy";
     }
   };
+
+const handleSearch = () => {
+  if (!departureLocation || !destinationLocation || !journeyDate) return;
+
+  const params = new URLSearchParams({
+    fromCity: departureLocation.cityName,
+    fromCode: departureLocation.iataCode,
+    fromAirport: departureLocation.airportName,
+
+    toCity: destinationLocation.cityName,
+    toCode: destinationLocation.iataCode,
+    toAirport: destinationLocation.airportName,
+
+    depart: journeyDate.toISOString(),
+    return: returnDate ? returnDate.toISOString() : "",
+
+    adults: adultCount.toString(),
+    children: childCount.toString(),
+    infants: infantCount.toString(),
+
+    cabin: cabinClass,
+    tripType: isRoundTrip ? "ROUND_TRIP" : "ONE_WAY",
+  });
+
+  router.push(`/flights?${params.toString()}`);
+};
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
@@ -431,7 +457,8 @@ const FlightSearchComponent = () => {
       </div>
       {/* Search Button */}
       <div className=" w-full justify-end mt-4  flex">
-        <button className="w-40 px-6 py-3 bg-primary cursor-pointer text-white font-semibold rounded-lg transition-colors">
+        <button onClick={handleSearch}
+          className="w-40 px-6 py-3 bg-primary cursor-pointer text-white font-semibold rounded-lg transition-colors">
           Search
         </button>
       </div>
