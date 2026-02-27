@@ -15,8 +15,8 @@ import { useRouter } from "next/navigation";
 
 const FlightSearchComponent = () => {
   const {
-    departureLocation,
-    destinationLocation,
+    departureAirport,
+    destinationAirport,
     journeyDate,
     returnDate,
     isRoundTrip,
@@ -24,9 +24,9 @@ const FlightSearchComponent = () => {
     childCount,
     adultCount,
     cabinClass,
-    setDepartureLocation,
-    setDestinationLocation,
     setJourneyDate,
+    setDepartureAirport,
+    setDestinationAirport,
     setReturnDate,
     setIsRoundTrip,
     setInfantCount,
@@ -34,6 +34,21 @@ const FlightSearchComponent = () => {
     setAdultCount,
     setCabinClass,
   } = useFlightSearchStore();
+
+  // ✅ FIXED: Proper initialization
+  const [departureLocation, setDepartureLocation] = useState<Location>({
+    iataCode:  "NYC",
+    cityName: "New York City",
+    airportName: "New York",
+  });
+
+  // ✅ FIXED: Missing state added
+  const [destinationLocation, setDestinationLocation] = useState<Location>({
+    iataCode: "LHR",
+    cityName: "London",
+    airportName: "Heathrow",
+  });
+
   const router = useRouter();
   const [departureAirports, setDepartureAirports] = useState<Location[]>([]);
   const [destinationAirports, setDestinationAirports] = useState<Location[]>([]);
@@ -49,6 +64,7 @@ const FlightSearchComponent = () => {
   const departureRef = useRef<HTMLDivElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
   const passengerRef = useRef<HTMLDivElement>(null);
+
   const fetchAirports = async (keyword: string, type: "departure" | "destination") => {
     if (!keyword) return;
 
@@ -71,7 +87,6 @@ const FlightSearchComponent = () => {
     }
   };
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (departureRef.current && !departureRef.current.contains(event.target as Node)) {
@@ -89,7 +104,6 @@ const FlightSearchComponent = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       fetchAirports(departureSearch, "departure");
@@ -106,11 +120,15 @@ const FlightSearchComponent = () => {
     return () => clearTimeout(delayDebounce);
   }, [destinationSearch]);
 
-
+  // ✅ FIXED: Sync swap with store
   const handleSwapLocations = () => {
     const temp = departureLocation;
-    setDepartureLocation(destinationLocation!);
-    setDestinationLocation(temp!);
+
+    setDepartureLocation(destinationLocation);
+    setDestinationLocation(temp);
+
+    setDepartureAirport(destinationLocation.iataCode);
+    setDestinationAirport(temp.iataCode);
   };
 
   const getTotalPassengers = () => {
@@ -130,31 +148,26 @@ const FlightSearchComponent = () => {
     }
   };
 
-const handleSearch = () => {
-  if (!departureLocation || !destinationLocation || !journeyDate) return;
+  const handleSearch = () => {
+    if (!departureLocation || !destinationLocation || !journeyDate) return;
 
-  const params = new URLSearchParams({
-    fromCity: departureLocation.cityName,
-    fromCode: departureLocation.iataCode,
-    fromAirport: departureLocation.airportName,
+    const params = new URLSearchParams({
+      departure: departureLocation.iataCode,
+      destination: destinationLocation.iataCode,
 
-    toCity: destinationLocation.cityName,
-    toCode: destinationLocation.iataCode,
-    toAirport: destinationLocation.airportName,
+      depart: dayjs(journeyDate).format("YYYY-MM-DD"),
+      return: returnDate ? dayjs(returnDate).format("YYYY-MM-DD") : "",
 
-    depart: journeyDate.toISOString(),
-    return: returnDate ? returnDate.toISOString() : "",
+      adults: adultCount.toString(),
+      children: childCount.toString(),
+      infants: infantCount.toString(),
 
-    adults: adultCount.toString(),
-    children: childCount.toString(),
-    infants: infantCount.toString(),
+      cabin: cabinClass,
+      isRoundTrip: isRoundTrip.toString(),
+    });
 
-    cabin: cabinClass,
-    tripType: isRoundTrip ? "ROUND_TRIP" : "ONE_WAY",
-  });
-
-  router.push(`/flights?${params.toString()}`);
-};
+    router.push(`/flights?${params.toString()}`);
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
@@ -199,6 +212,8 @@ const handleSearch = () => {
                   key={airport.iataCode}
                   onClick={() => {
                     setDepartureLocation(airport);
+                    setDepartureAirport(airport.iataCode); // ✅ SAVE TO STORE
+
                     setShowDepartureDropdown(false);
                     setDepartureSearch("");
                   }}
@@ -252,6 +267,8 @@ const handleSearch = () => {
                   onClick={() => {
                     setDestinationLocation(airport);
                     setShowDestinationDropdown(false);
+                    setDestinationAirport(airport.iataCode); // ✅ SAVE TO STORE
+
                     setDestinationSearch("");
                   }}
                   className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
