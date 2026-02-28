@@ -15,8 +15,6 @@ import { useRouter } from "next/navigation";
 
 const FlightSearchComponent = () => {
   const {
-    departureAirport,
-    destinationAirport,
     journeyDate,
     returnDate,
     isRoundTrip,
@@ -76,9 +74,9 @@ const FlightSearchComponent = () => {
       });
 
       if (type === "departure") {
-        setDepartureAirports(res.data);
+        setDepartureAirports(res.data.data);
       } else {
-        setDestinationAirports(res.data);
+        setDestinationAirports(res.data.data);
       }
     } catch (error) {
       console.error("Airport fetch error:", error);
@@ -163,7 +161,7 @@ const FlightSearchComponent = () => {
       infants: infantCount.toString(),
 
       cabin: cabinClass,
-      isRoundTrip: isRoundTrip.toString(),
+      tripType: isRoundTrip ? "ROUND_TRIP" : "ONE_WAY",
     });
 
     router.push(`/flights?${params.toString()}`);

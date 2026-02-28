@@ -7,13 +7,12 @@ const HeroSection = () => {
   return (
     <div className="relative w-full h-screen flex items-center justify-center">
 
-      {/* Background Image */}
       <Image
         src="/home/hero.jpg"
         alt="Hero Background"
         fill
         priority
-        className="object-cover"
+        className="object-bottom"
       />
 
       {/* Dark Overlay (optional but recommended) */}
