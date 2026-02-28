@@ -127,13 +127,17 @@ const [destinationLocation, setDestinationLocation] = useState<Location | null>(
     return () => clearTimeout(t);
   }, [destinationSearch]);
 
-  const handleSwapLocations = () => {
-    const temp = departureLocation;
-    setDepartureLocation(destinationLocation);
-    setDestinationLocation(temp);
-    setDepartureAirport(destinationLocation.iataCode);
-    setDestinationAirport(temp.iataCode);
-  };
+const handleSwapLocations = () => {
+  if (!departureLocation || !destinationLocation) return;
+
+  const temp = departureLocation;
+
+  setDepartureLocation(destinationLocation);
+  setDestinationLocation(temp);
+
+  setDepartureAirport(destinationLocation.iataCode);
+  setDestinationAirport(temp.iataCode);
+};
 
   const getTotalPassengers = () => adultCount + childCount + infantCount;
 
