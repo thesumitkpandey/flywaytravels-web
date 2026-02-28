@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 
 const FlightSearchComponent = () => {
   const {
+    departureAirport,
+    destinationAirport,
     journeyDate,
     returnDate,
     isRoundTrip,
@@ -30,13 +32,13 @@ const FlightSearchComponent = () => {
   } = useFlightSearchStore();
 
   const [departureLocation, setDepartureLocation] = useState<Location>({
-    iataCode: "NYC",
+    iataCode: departureAirport,
     cityName: "New York City",
     airportName: "New York",
   });
 
   const [destinationLocation, setDestinationLocation] = useState<Location>({
-    iataCode: "LHR",
+    iataCode: destinationAirport,
     cityName: "London",
     airportName: "Heathrow",
   });

@@ -26,7 +26,7 @@ interface FlightSearchState {
 export const useFlightSearchStore = create<FlightSearchState>((set) => ({
   // States
   departureAirport: "NYC",
-  destinationAirport: "DXB",
+  destinationAirport: "LHR",
   journeyDate: null,
   returnDate: null,
   isRoundTrip: false,
