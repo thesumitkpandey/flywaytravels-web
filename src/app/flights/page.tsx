@@ -6,6 +6,7 @@ import { useFlightSearchStore } from "@/store/search.store";
 import { CabinClass, FlightSearchResponse, FlightOffer } from "@/types/flight";
 import axiosInstance from "@/provider/axios";
 import FlightResults from "./components/FlightResults";
+import FlightSearchComponent from "@/component/search";
 export default function Flights() {
   const searchParams = useSearchParams();
 
@@ -103,6 +104,7 @@ export default function Flights() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      <FlightSearchComponent/>
       <FlightResults flights={flights} loading={loading} error={error} />
     </div>
   );
