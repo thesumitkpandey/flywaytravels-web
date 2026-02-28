@@ -192,7 +192,7 @@ const handleSwapLocations = () => {
             One Way
           </button>
           <button
-            onClick={() => setIsRoundTrip(false)}
+            onClick={() => setIsRoundTrip(true)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
               isRoundTrip
                 ? "bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]"
