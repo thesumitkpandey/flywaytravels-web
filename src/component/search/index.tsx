@@ -31,17 +31,8 @@ const FlightSearchComponent = () => {
     setCabinClass,
   } = useFlightSearchStore();
 
-  const [departureLocation, setDepartureLocation] = useState<Location>({
-    iataCode: departureAirport,
-    cityName: "New York City",
-    airportName: "New York",
-  });
-
-  const [destinationLocation, setDestinationLocation] = useState<Location>({
-    iataCode: destinationAirport,
-    cityName: "London",
-    airportName: "Heathrow",
-  });
+const [departureLocation, setDepartureLocation] = useState<Location | null>(null);
+const [destinationLocation, setDestinationLocation] = useState<Location | null>(null);
 
   const [fareType, setFareType] = useState<"regular" | "student">("regular");
 
@@ -77,6 +68,41 @@ const FlightSearchComponent = () => {
       setLoadingAirports(false);
     }
   };
+
+  useEffect(() => {
+  const fetchAirportByCode = async (
+    code: string,
+    type: "departure" | "destination"
+  ) => {
+    try {
+      const res = await axiosInstance.get("/airports/search", {
+        params: { keyword: code },
+      });
+
+      const airport = res.data.data?.find(
+        (a: Location) => a.iataCode === code
+      );
+
+      if (!airport) return;
+
+      if (type === "departure") {
+        setDepartureLocation(airport);
+      } else {
+        setDestinationLocation(airport);
+      }
+    } catch (err) {
+      console.error("Airport fetch failed", err);
+    }
+  };
+
+  if (departureAirport) {
+    fetchAirportByCode(departureAirport, "departure");
+  }
+
+  if (destinationAirport) {
+    fetchAirportByCode(destinationAirport, "destination");
+  }
+}, [departureAirport, destinationAirport]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
