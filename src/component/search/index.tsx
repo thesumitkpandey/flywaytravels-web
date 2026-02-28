@@ -3,13 +3,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useFlightSearchStore } from "@/store/search.store";
 import { Location, CabinClass } from "@/types/flight";
-import { format } from "date-fns";
 import axiosInstance from "@/provider/axios";
-import { ArrowLeftRight, Minus, Plus } from "lucide-react";
-import { Radio } from "antd";
-import type { RadioChangeEvent } from "antd";
+import { ArrowLeftRight, Minus, Plus, ChevronDown, GraduationCap, User } from "lucide-react";
 import { DatePicker } from "antd";
-import type { DatePickerProps } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 
@@ -33,19 +29,19 @@ const FlightSearchComponent = () => {
     setCabinClass,
   } = useFlightSearchStore();
 
-  // ✅ FIXED: Proper initialization
   const [departureLocation, setDepartureLocation] = useState<Location>({
-    iataCode:  "NYC",
+    iataCode: "NYC",
     cityName: "New York City",
     airportName: "New York",
   });
 
-  // ✅ FIXED: Missing state added
   const [destinationLocation, setDestinationLocation] = useState<Location>({
     iataCode: "LHR",
     cityName: "London",
     airportName: "Heathrow",
   });
+
+  const [fareType, setFareType] = useState<"regular" | "student">("regular");
 
   const router = useRouter();
   const [departureAirports, setDepartureAirports] = useState<Location[]>([]);
@@ -65,14 +61,9 @@ const FlightSearchComponent = () => {
 
   const fetchAirports = async (keyword: string, type: "departure" | "destination") => {
     if (!keyword) return;
-
     try {
       setLoadingAirports(true);
-
-      const res = await axiosInstance.get("/airports/search", {
-        params: { keyword },
-      });
-
+      const res = await axiosInstance.get("/airports/search", { params: { keyword } });
       if (type === "departure") {
         setDepartureAirports(res.data.data);
       } else {
@@ -86,395 +77,403 @@ const FlightSearchComponent = () => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (departureRef.current && !departureRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (departureRef.current && !departureRef.current.contains(e.target as Node))
         setShowDepartureDropdown(false);
-      }
-      if (destinationRef.current && !destinationRef.current.contains(event.target as Node)) {
+      if (destinationRef.current && !destinationRef.current.contains(e.target as Node))
         setShowDestinationDropdown(false);
-      }
-      if (passengerRef.current && !passengerRef.current.contains(event.target as Node)) {
+      if (passengerRef.current && !passengerRef.current.contains(e.target as Node))
         setShowPassengerDropdown(false);
-      }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchAirports(departureSearch, "departure");
-    }, 400);
-
-    return () => clearTimeout(delayDebounce);
+    const t = setTimeout(() => fetchAirports(departureSearch, "departure"), 400);
+    return () => clearTimeout(t);
   }, [departureSearch]);
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchAirports(destinationSearch, "destination");
-    }, 400);
-
-    return () => clearTimeout(delayDebounce);
+    const t = setTimeout(() => fetchAirports(destinationSearch, "destination"), 400);
+    return () => clearTimeout(t);
   }, [destinationSearch]);
 
-  // ✅ FIXED: Sync swap with store
   const handleSwapLocations = () => {
     const temp = departureLocation;
-
     setDepartureLocation(destinationLocation);
     setDestinationLocation(temp);
-
     setDepartureAirport(destinationLocation.iataCode);
     setDestinationAirport(temp.iataCode);
   };
 
-  const getTotalPassengers = () => {
-    return adultCount + childCount + infantCount;
-  };
+  const getTotalPassengers = () => adultCount + childCount + infantCount;
 
   const getCabinClassLabel = (cabin: CabinClass) => {
     switch (cabin) {
-      case CabinClass.ECONOMY:
-        return "Economy";
-      case CabinClass.PREMIUM_ECONOMY:
-        return "Premium Economy";
-      case CabinClass.BUSINESS:
-        return "Business";
-      default:
-        return "Economy";
+      case CabinClass.ECONOMY: return "Economy";
+      case CabinClass.PREMIUM_ECONOMY: return "Premium Economy";
+      case CabinClass.BUSINESS: return "Business";
+      default: return "Economy";
     }
   };
 
   const handleSearch = () => {
     if (!departureLocation || !destinationLocation || !journeyDate) return;
-
     const params = new URLSearchParams({
       departure: departureLocation.iataCode,
       destination: destinationLocation.iataCode,
-
       depart: dayjs(journeyDate).format("YYYY-MM-DD"),
       return: returnDate ? dayjs(returnDate).format("YYYY-MM-DD") : "",
-
       adults: adultCount.toString(),
       children: childCount.toString(),
       infants: infantCount.toString(),
-
       cabin: cabinClass,
       tripType: isRoundTrip ? "ROUND_TRIP" : "ONE_WAY",
     });
-
     router.push(`/flights?${params.toString()}`);
   };
 
-  return (
-    <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
-      {/* Trip Type Selection */}
-      <div className="mb-6">
-        <Radio.Group
-          className="trip-type-radio"
-          value={isRoundTrip ? "ROUND_TRIP" : "ONE_WAY"}
-          onChange={(e: RadioChangeEvent) => {
-            setIsRoundTrip(e.target.value === "ROUND_TRIP");
-          }}
-          optionType="button"
-          buttonStyle="solid"
-        >
-          <Radio.Button value="ONE_WAY">One Way</Radio.Button>
-          <Radio.Button value="ROUND_TRIP">Round Trip</Radio.Button>
-        </Radio.Group>
+  // Shared field box classes
+  const fieldBoxBase =
+    "bg-white border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer transition-all duration-200 hover:border-red-500 hover:shadow-[0_0_0_3px_rgba(227,24,55,0.08)] focus-within:border-red-500 focus-within:shadow-[0_0_0_3px_rgba(227,24,55,0.08)] relative min-w-0";
 
+  const fieldLabel = "text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-0.5";
+
+  const dropdownItem =
+    "px-4 py-3 cursor-pointer border-b border-gray-50 last:border-b-0 hover:bg-red-50 transition-colors duration-150";
+
+  return (
+    <div className="w-full max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 font-sans">
+
+      {/* ── Trip Type Pills ── */}
+      <div className="flex items-center gap-3 mb-5 flex-wrap">
+        <div className="flex bg-gray-100 rounded-full p-1 gap-0.5">
+          <button
+            onClick={() => setIsRoundTrip(false)}
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+              !isRoundTrip
+                ? "bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            One Way
+          </button>
+          <button
+            onClick={() => setIsRoundTrip(true)}
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+              isRoundTrip
+                ? "bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Round Trip
+          </button>
+        </div>
       </div>
 
+      {/* ── Main Search Row ── */}
+      <div className="flex items-stretch gap-2 flex-nowrap">
 
-      {/* Main Search Form */}
-      <div className="grid grid-cols-14 gap-4 mb-4">
-        {/* From - Departure Location */}
-        <div className="col-span-12 md:col-span-3 relative" ref={departureRef}>
-          <label className="block text-sm text-gray-600 mb-1">From</label>
-          <input
-            type="text"
-            value={showDepartureDropdown ? departureSearch : `${departureLocation?.cityName} (${departureLocation?.iataCode})`}
-            onChange={(e) => setDepartureSearch(e.target.value)}
-            onFocus={() => {
-              setShowDepartureDropdown(true);
-              setDepartureSearch("");
-            }}
-            placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-0 text-black transition-colors"
-          />
+        {/* Departure */}
+        <div className={`${fieldBoxBase} flex-1`} ref={departureRef}>
+          <div className={fieldLabel}>From</div>
+          {showDepartureDropdown ? (
+            <input
+              autoFocus
+              type="text"
+              value={departureSearch}
+              onChange={(e) => setDepartureSearch(e.target.value)}
+              placeholder="City or airport"
+              className="border-none outline-none bg-transparent text-2xl font-bold text-gray-900 w-full tracking-tight placeholder:text-base placeholder:font-normal placeholder:text-gray-300 p-0"
+            />
+          ) : (
+            <div
+              onClick={() => {
+                setShowDepartureDropdown(true);
+                setDepartureSearch("");
+              }}
+            >
+              <div className="text-2xl font-bold text-gray-900 leading-tight tracking-tight">
+                {departureLocation?.iataCode}
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5 truncate">
+                {departureLocation?.cityName}, {departureLocation?.airportName}
+              </div>
+            </div>
+          )}
+
           {showDepartureDropdown && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[260px] bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-h-60 overflow-y-auto z-50">
               {departureAirports.map((airport) => (
                 <div
                   key={airport.iataCode}
+                  className={dropdownItem}
                   onClick={() => {
                     setDepartureLocation(airport);
-                    setDepartureAirport(airport.iataCode); // ✅ SAVE TO STORE
-
+                    setDepartureAirport(airport.iataCode);
                     setShowDepartureDropdown(false);
                     setDepartureSearch("");
                   }}
-                  className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
-                  <div className="font-medium text-gray-900">
-                    {airport.cityName} ({airport.iataCode})
+                  <div className="text-sm font-semibold text-gray-900">
+                    {airport.cityName}{" "}
+                    <span className="text-red-600">({airport.iataCode})</span>
                   </div>
-                  <div className="text-sm text-gray-600">{airport.airportName}</div>
+                  <div className="text-xs text-gray-400">{airport.airportName}</div>
                 </div>
               ))}
               {!loadingAirports && departureAirports.length === 0 && (
-                <div className="px-4 py-3 text-gray-500">No airports found</div>
+                <div className={`${dropdownItem} text-gray-400 text-sm`}>No airports found</div>
               )}
             </div>
           )}
         </div>
 
         {/* Swap Button */}
-        <div className="col-span-12 md:col-span-1 flex items-center justify-center mt-6">
+        <div className="flex items-center flex-shrink-0">
           <button
             onClick={handleSwapLocations}
-            // className="p-3  bg-white hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
             aria-label="Swap locations"
+            className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 hover:border-red-500 hover:bg-red-50 hover:rotate-180"
           >
-            <ArrowLeftRight className="h-5 w-5 text-primary" />
+            <ArrowLeftRight size={16} className="text-red-600" />
           </button>
         </div>
 
+        {/* Destination */}
+        <div className={`${fieldBoxBase} flex-1`} ref={destinationRef}>
+          <div className={fieldLabel}>To</div>
+          {showDestinationDropdown ? (
+            <input
+              autoFocus
+              type="text"
+              value={destinationSearch}
+              onChange={(e) => setDestinationSearch(e.target.value)}
+              placeholder="City or airport"
+              className="border-none outline-none bg-transparent text-2xl font-bold text-gray-900 w-full tracking-tight placeholder:text-base placeholder:font-normal placeholder:text-gray-300 p-0"
+            />
+          ) : (
+            <div
+              onClick={() => {
+                setShowDestinationDropdown(true);
+                setDestinationSearch("");
+              }}
+            >
+              <div className="text-2xl font-bold text-gray-900 leading-tight tracking-tight">
+                {destinationLocation?.iataCode}
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5 truncate">
+                {destinationLocation?.cityName}, {destinationLocation?.airportName}
+              </div>
+            </div>
+          )}
 
-
-        {/* To - Destination Location */}
-        <div className="col-span-12 md:col-span-3 relative" ref={destinationRef}>
-          <label className="block text-sm text-gray-600 mb-1">To</label>
-          <input
-            type="text"
-            value={showDestinationDropdown ? destinationSearch : `${destinationLocation?.cityName} (${destinationLocation?.iataCode})`}
-            onChange={(e) => setDestinationSearch(e.target.value)}
-            onFocus={() => {
-              setShowDestinationDropdown(true);
-              setDestinationSearch("");
-            }}
-            placeholder="Enter city or airport"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-0 text-black transition-colors"
-          />
           {showDestinationDropdown && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[260px] bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-h-60 overflow-y-auto z-50">
               {destinationAirports.map((airport) => (
                 <div
                   key={airport.iataCode}
+                  className={dropdownItem}
                   onClick={() => {
                     setDestinationLocation(airport);
+                    setDestinationAirport(airport.iataCode);
                     setShowDestinationDropdown(false);
-                    setDestinationAirport(airport.iataCode); // ✅ SAVE TO STORE
-
                     setDestinationSearch("");
                   }}
-                  className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
-                  <div className="font-medium text-gray-900">
-                    {airport.cityName} ({airport.iataCode})
+                  <div className="text-sm font-semibold text-gray-900">
+                    {airport.cityName}{" "}
+                    <span className="text-red-600">({airport.iataCode})</span>
                   </div>
-                  <div className="text-sm text-gray-600">{airport.airportName}</div>
+                  <div className="text-xs text-gray-400">{airport.airportName}</div>
                 </div>
               ))}
               {!loadingAirports && destinationAirports.length === 0 && (
-                <div className="px-4 py-3 text-gray-500">No airports found</div>
+                <div className={`${dropdownItem} text-gray-400 text-sm`}>No airports found</div>
               )}
             </div>
           )}
         </div>
 
-        {/* Departure Date */}
-        <div className="col-span-12 md:col-span-2">
-          <label className="block text-sm text-black mb-1">Depart</label>
+        {/* Divider */}
+        <div className="w-px h-12 bg-gray-200 flex-shrink-0 self-center" />
+
+        {/* Depart Date */}
+        <div className={`${fieldBoxBase}`} style={{ minWidth: 140 }}>
+          <div className={fieldLabel}>Depart</div>
           <DatePicker
             value={journeyDate ? dayjs(journeyDate) : null}
-            onChange={(date) => {
-              setJourneyDate(date ? date.toDate() : null);
-            }}
-            format="YYYY-MM-DD"
-            className="w-full h-[46px] !border !border-gray-300 !rounded-lg hover:!border-black focus:!border-black focus:!shadow-none"
+            onChange={(date) => setJourneyDate(date ? date.toDate() : null)}
+            format="DD MMM 'YY"
+            placeholder="Select date"
+            variant="borderless"
+            className="!p-0 !border-none !shadow-none !bg-transparent w-full [&_.ant-picker-input_input]:!text-lg [&_.ant-picker-input_input]:!font-bold [&_.ant-picker-input_input]:!text-gray-900 [&_.ant-picker-input_input]:!tracking-tight [&_.ant-picker-suffix]:!hidden"
+            popupClassName="[&_.ant-picker-panel]:!rounded-2xl [&_.ant-picker-panel]:!shadow-2xl [&_.ant-picker-cell-selected_.ant-picker-cell-inner]:!bg-red-600 [&_.ant-picker-cell-today_.ant-picker-cell-inner]:!border-red-600 [&_.ant-picker-cell-today_.ant-picker-cell-inner]:!text-red-600 [&_.ant-picker-header-view_button:hover]:!text-red-600 [&_.ant-picker-today-btn]:!text-red-600"
           />
-
-
+          {journeyDate && (
+            <div className="text-xs text-gray-400 mt-0.5">{dayjs(journeyDate).format("dddd")}</div>
+          )}
         </div>
 
-        {/* Return Date (conditionally rendered) */}
-        {isRoundTrip && (
-          <div className="col-span-12 md:col-span-2">
-            <label className="block text-sm text-gray-600 mb-1">Return</label>
-            <DatePicker
-              value={returnDate ? dayjs(returnDate) : null}
-              onChange={(date) => {
-                setReturnDate(date ? date.toDate() : null);
-              }}
-              format="YYYY-MM-DD"
-              className="w-full h-[46px] !border !border-gray-300 !rounded-lg hover:!border-black focus:!border-black focus:!shadow-none"
-            />
-
-
-
-          </div>
-        )}
-
-        {/* Add Return button for one way */}
-        {!isRoundTrip && (
-          <div className="col-span-12 md:col-span-2 flex items-end">
-            <button
+        {/* Return Date or Add Return */}
+        {isRoundTrip ? (
+          <>
+            <div className="w-px h-12 bg-gray-200 flex-shrink-0 self-center" />
+            <div className={`${fieldBoxBase}`} style={{ minWidth: 140 }}>
+              <div className={fieldLabel}>Return</div>
+              <DatePicker
+                value={returnDate ? dayjs(returnDate) : null}
+                onChange={(date) => setReturnDate(date ? date.toDate() : null)}
+                format="DD MMM 'YY"
+                placeholder="Select date"
+                variant="borderless"
+                className="!p-0 !border-none !shadow-none !bg-transparent w-full [&_.ant-picker-input_input]:!text-lg [&_.ant-picker-input_input]:!font-bold [&_.ant-picker-input_input]:!text-gray-900 [&_.ant-picker-input_input]:!tracking-tight [&_.ant-picker-suffix]:!hidden"
+                popupClassName="[&_.ant-picker-panel]:!rounded-2xl [&_.ant-picker-panel]:!shadow-2xl [&_.ant-picker-cell-selected_.ant-picker-cell-inner]:!bg-red-600 [&_.ant-picker-cell-today_.ant-picker-cell-inner]:!border-red-600 [&_.ant-picker-cell-today_.ant-picker-cell-inner]:!text-red-600 [&_.ant-picker-header-view_button:hover]:!text-red-600 [&_.ant-picker-today-btn]:!text-red-600"
+              />
+              {returnDate && (
+                <div className="text-xs text-gray-400 mt-0.5">{dayjs(returnDate).format("dddd")}</div>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-px h-12 bg-gray-200 flex-shrink-0 self-center" />
+            <div
+              className="flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 cursor-pointer hover:border-red-400 hover:bg-red-50 transition-all duration-200"
+              style={{ minWidth: 140 }}
               onClick={() => setIsRoundTrip(true)}
-              className="w-full px-4 py-3 text-black hover:bg-blue-50 rounded-lg transition-colors font-medium"
             >
-              Add Return
-            </button>
-          </div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-300 mb-1">
+                Return
+              </div>
+              <div className="text-sm font-semibold text-red-600">+ Add Return</div>
+            </div>
+          </>
         )}
 
-        {/* Passenger & Class */}
-        <div className="col-span-12 md:col-span-3 relative" ref={passengerRef}>
-          <label className="block text-sm text-gray-600 mb-1">Passenger & Class</label>
+        {/* Divider */}
+        <div className="w-px h-12 bg-gray-200 flex-shrink-0 self-center" />
+
+        {/* Passengers & Class */}
+        <div className={`${fieldBoxBase}`} style={{ minWidth: 160 }} ref={passengerRef}>
+          <div className={fieldLabel}>Travellers & Class</div>
           <button
             onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:outline-none focus:border-black focus:ring-0 hover:border-black transition-colors flex items-center justify-between overflow-hidden"
+            className="border-none bg-transparent p-0 cursor-pointer text-left w-full"
           >
-            <span className="text-black truncate whitespace-nowrap">
-              {getTotalPassengers()} Traveller{getTotalPassengers() !== 1 ? "s" : ""}, {getCabinClassLabel(cabinClass)}
-            </span>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={`h-5 w-5 text-gray-400 transition-transform ${showPassengerDropdown ? "rotate-180" : ""}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <div className="flex items-center justify-between">
+              <span className="text-xl font-bold text-gray-900 tracking-tight">
+                {getTotalPassengers()}{" "}
+                <span className="text-sm font-medium text-gray-500">
+                  Traveller{getTotalPassengers() !== 1 ? "s" : ""}
+                </span>
+              </span>
+              <ChevronDown
+                size={16}
+                className={`text-gray-400 transition-transform duration-200 ${showPassengerDropdown ? "rotate-180" : ""}`}
+              />
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">{getCabinClassLabel(cabinClass)}</div>
           </button>
 
           {showPassengerDropdown && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-              {/* Adults */}
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-                <div>
-                  <div className="font-medium text-gray-900">Adults</div>
-                  <div className="text-sm text-gray-500">12+ years</div>
+            <div className="absolute top-[calc(100%+6px)] right-0 w-72 bg-white border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-5 z-50">
+              {[
+                { label: "Adults", sub: "12+ years", count: adultCount, set: setAdultCount },
+                { label: "Children", sub: "2–12 years", count: childCount, set: setChildCount },
+                { label: "Infants", sub: "Under 2 years", count: infantCount, set: setInfantCount },
+              ].map(({ label, sub, count, set }) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between py-3 border-b border-gray-50 last:border-b-0"
+                >
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">{label}</div>
+                    <div className="text-xs text-gray-400">{sub}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      disabled={count === 0}
+                      onClick={() => count > 0 && set(count - 1)}
+                      className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all duration-150 hover:border-red-500 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-6 text-center font-bold text-base text-gray-900">{count}</span>
+                    <button
+                      onClick={() => set(count + 1)}
+                      className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all duration-150 hover:border-red-500 hover:text-red-600"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
-                    disabled={adultCount === 0}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    <Minus className="h-4 w-4 text-black" />
-                  </button>
+              ))}
 
-                  <span className="w-8 text-center font-medium text-black">{adultCount}</span>
-                  <button
-                    onClick={() => setAdultCount(adultCount + 1)}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center text-black"
-                  >
-                    <Plus className="h-4 w-4 text-black" />
-
-                  </button>
+              <div className="mt-4">
+                <div className="text-xs font-semibold text-gray-700 mb-2.5 uppercase tracking-widest">
+                  Cabin Class
                 </div>
-              </div>
-
-              {/* Children */}
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-                <div>
-                  <div className="font-medium text-gray-900">Children</div>
-                  <div className="text-sm text-gray-500">2-12 years</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => childCount > 0 && setChildCount(childCount - 1)}
-                    disabled={childCount === 0}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    <Minus className="h-4 w-4 text-black" />
-
-                  </button>
-                  <span className="w-8 text-center font-medium text-black">{childCount}</span>
-                  <button
-                    onClick={() => setChildCount(childCount + 1)}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center"
-                  >
-                    <Plus className="h-4 w-4 text-black" />
-
-                  </button>
-                </div>
-              </div>
-
-              {/* Infants */}
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-                <div>
-                  <div className="font-medium text-gray-900">Infants</div>
-                  <div className="text-sm text-gray-500">Under 2 years</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => infantCount > 0 && setInfantCount(infantCount - 1)}
-                    disabled={infantCount === 0}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    <Minus className="h-4 w-4 text-black" />
-
-                  </button>
-                  <span className="w-8 text-center font-medium text-black">{infantCount}</span>
-                  <button
-                    onClick={() => setInfantCount(infantCount + 1)}
-                    className="w-8 h-8 rounded-full border border-black hover:bg-gray-100 flex items-center justify-center"
-                  >
-                    <Plus className="h-4 w-4 text-black" />
-
-                  </button>
-                </div>
-              </div>
-
-              {/* Cabin Class */}
-              <div className="mb-2">
-                <div className="font-medium text-gray-900 mb-2">Cabin Class</div>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={cabinClass === CabinClass.ECONOMY}
-                      onChange={() => setCabinClass(CabinClass.ECONOMY)}
-                      className="w-4 h-4 text-black accent-black"
-                    />
-                    <span className="text-gray-700">Economy</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={cabinClass === CabinClass.PREMIUM_ECONOMY}
-                      onChange={() => setCabinClass(CabinClass.PREMIUM_ECONOMY)}
-                      className="w-4 h-4 text-black accent-black"
-                    />
-                    <span className="text-gray-700">Premium Economy</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={cabinClass === CabinClass.BUSINESS}
-                      onChange={() => setCabinClass(CabinClass.BUSINESS)}
-                      className="w-4 h-4 text-black accent-black"
-                    />
-                    <span className="text-gray-700">Business</span>
-                  </label>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { val: CabinClass.ECONOMY, label: "Economy" },
+                    { val: CabinClass.PREMIUM_ECONOMY, label: "Prem. Economy" },
+                    { val: CabinClass.BUSINESS, label: "Business" },
+                  ].map(({ val, label }) => (
+                    <button
+                      key={val}
+                      onClick={() => setCabinClass(val)}
+                      className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all duration-150 ${
+                        cabinClass === val
+                          ? "border-red-600 bg-red-50 text-red-600"
+                          : "border-gray-200 bg-white text-gray-500 hover:border-red-300 hover:text-red-500"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           )}
         </div>
-
-
       </div>
-      {/* Search Button */}
-      <div className=" w-full justify-end mt-4  flex">
-        <button onClick={handleSearch}
-          className="w-40 px-6 py-3 bg-primary cursor-pointer text-white font-semibold rounded-lg transition-colors">
-          Search
+
+      {/* ── Bottom Row: Fare Type + Search Button ── */}
+      <div className="flex items-center justify-between mt-5">
+        {/* Fare Type Pills */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFareType("regular")}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
+              fareType === "regular"
+                ? "border-red-600 bg-red-50 text-red-600"
+                : "border-gray-200 bg-white text-gray-500 hover:border-red-300"
+            }`}
+          >
+            <User size={13} />
+            Regular Fare
+          </button>
+          <button
+            onClick={() => setFareType("student")}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
+              fareType === "student"
+                ? "border-red-600 bg-red-50 text-red-600"
+                : "border-gray-200 bg-white text-gray-500 hover:border-red-300"
+            }`}
+          >
+            <GraduationCap size={13} />
+            Student Fare
+          </button>
+        </div>
+
+        {/* Search Button */}
+        <button
+          onClick={handleSearch}
+          className="bg-red-600 text-white border-none rounded-xl px-10 py-3.5 text-[15px] font-bold cursor-pointer tracking-wide shadow-[0_4px_16px_rgba(227,24,55,0.35)] transition-all duration-200 hover:bg-red-700 hover:shadow-[0_6px_20px_rgba(227,24,55,0.45)] hover:-translate-y-px active:translate-y-0"
+        >
+          Search Flights
         </button>
       </div>
     </div>

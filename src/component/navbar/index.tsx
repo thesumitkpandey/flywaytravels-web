@@ -6,38 +6,29 @@ import Image from "next/image";
 export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full z-50">
-      <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
-        
+<div className="max-w-360 mx-auto px-10 py-6 flex items-center justify-between">        
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
             alt="Flyway Logo"
-            width={150}
-            height={45}
+            width={190}   // bigger logo
+            height={55}
             priority
             className="object-contain"
           />
         </Link>
 
         {/* Right Side */}
-        <div className="flex items-center gap-6">
-          
-          <Link
+        <div className="flex items-center">
+          {/* <Link
             href="/login"
-            className="text-white text-sm font-medium hover:opacity-80 transition-opacity duration-200"
+            className="text-primary text-lg font-semibold px-10 py-2 rounded-xl border border-primary transition-all duration-200 hover:bg-primary hover:text-white"
           >
             Login
-          </Link>
-
-          <Link
-            href="/signup"
-            className="text-sm font-semibold px-8 py-2.5 rounded-full border border-white text-white hover:bg-white hover:text-black transition-all duration-200"
-          >
-            Sign Up
-          </Link>
-
+          </Link> */}
         </div>
+
       </div>
     </nav>
   );
