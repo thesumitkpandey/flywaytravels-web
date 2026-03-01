@@ -3,21 +3,28 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
+# Enable pnpm
 RUN corepack enable
 
-# Copy package files first (for caching)
+# Copy dependency files first (for caching)
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
+# Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy rest of project
+# Copy project files
 COPY . .
 
-# Build Next.js app
+# Increase Node memory (important for small VPS)
 ENV NODE_OPTIONS="--max-old-space-size=1536"
-RUN pnpm build --no-turbo
+
+# Disable Turbopack (must be env, not CLI)
+ENV NEXT_DISABLE_TURBOPACK=1
+
+# Build Next.js app
+RUN pnpm build
+
+
 # ---------- Stage 2: Production ----------
 FROM node:20-alpine
 
@@ -25,14 +32,18 @@ WORKDIR /app
 
 RUN corepack enable
 
-# Copy only necessary files from builder
+# Copy required files from builder
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./next.config.js
 
-# Install only production deps
+# Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
+
+# Ensure production mode
+ENV NODE_ENV=production
 
 EXPOSE 3000
 
