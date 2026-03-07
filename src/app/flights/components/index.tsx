@@ -59,7 +59,7 @@ export default function FlightsClient() {
           tripType: tripType || "ONE_WAY",
           cabinClass: cabin || "ECONOMY",
           segments:
-            tripType === "ROUNDTRIP"
+            tripType === "ROUND_TRIP"
               ? [
                   {
                     origin: fromAirport,
