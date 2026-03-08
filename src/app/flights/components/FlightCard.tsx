@@ -20,7 +20,7 @@ export default function FlightCard({ flight }: Props) {
   const isRoundTrip = flight.slices.length > 1;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] hover:border-red-200 transition-all duration-200">
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_40px_rgba(0,0,0,0.10)] hover:border-amber-400/60 transition-all duration-200">
 
       {/* ── Top bar: price + badges + book ── */}
       <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
@@ -29,7 +29,7 @@ export default function FlightCard({ flight }: Props) {
             <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
               {flight.currency}
             </span>
-            <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            <span className="text-2xl font-extrabold text-[#171717] tracking-tight">
               {Number(flight.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -52,7 +52,7 @@ export default function FlightCard({ flight }: Props) {
         </div>
 
         <div className="flex flex-col items-end gap-1.5">
-          <button className="bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm font-bold px-7 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(227,24,55,0.35)] hover:shadow-[0_6px_20px_rgba(227,24,55,0.45)] hover:-translate-y-px transition-all duration-150">
+          <button className="bg-amber-400 hover:bg-amber-300 active:scale-95 text-[#0a0a0f] text-sm font-bold px-7 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(251,191,36,0.40)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.50)] hover:-translate-y-px transition-all duration-150">
             Book Now
           </button>
           <span className="text-[10px] text-gray-400">
@@ -84,7 +84,7 @@ export default function FlightCard({ flight }: Props) {
               {/* Round-trip slice label */}
               {isRoundTrip && (
                 <div className="flex items-center gap-3 mb-5">
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-red-500 shrink-0">
+                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-amber-500 shrink-0">
                     {sliceIndex === 0 ? "↗  Outbound" : "↙  Return"}
                   </span>
                   <div className="flex-1 h-px bg-gray-100" />
@@ -112,7 +112,7 @@ export default function FlightCard({ flight }: Props) {
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[11px] font-semibold text-gray-800 leading-tight truncate">
+                        <p className="text-[11px] font-semibold text-[#171717] leading-tight truncate">
                           {airline.name}
                         </p>
                         <p className="text-[10px] text-gray-400">{airline.iataCode}</p>
@@ -123,7 +123,7 @@ export default function FlightCard({ flight }: Props) {
 
                 {/* Departure */}
                 <div className="text-center shrink-0">
-                  <p className="text-2xl font-extrabold text-gray-900 tabular-nums leading-none tracking-tight">
+                  <p className="text-2xl font-extrabold text-[#171717] tabular-nums leading-none tracking-tight">
                     {formatTime(firstSeg.departureTime)}
                   </p>
                   <p className="text-sm font-bold text-gray-700 mt-0.5">{firstSeg.origin}</p>
@@ -134,22 +134,22 @@ export default function FlightCard({ flight }: Props) {
                 <div className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
                   <span className="text-xs text-gray-500 font-semibold">{slice.duration}</span>
                   <div className="w-full flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                    <div className="flex-1 relative h-[1.5px] bg-gray-200">
+                    <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                    <div className="flex-1 relative h-[1.5px] bg-amber-400/30">
                       {layoverAirports.map((airport, idx) => (
                         <div
                           key={idx}
                           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center"
                           style={{ left: `${((idx + 1) / slice.segments.length) * 100}%` }}
                         >
-                          <div className="w-2 h-2 rounded-full bg-white border-2 border-red-400" />
+                          <div className="w-2 h-2 rounded-full bg-white border-2 border-amber-400" />
                         </div>
                       ))}
-                      <span className="absolute left-1/2 -translate-x-1/2 -top-3.5 text-[13px] leading-none text-red-500">
+                      <span className="absolute left-1/2 -translate-x-1/2 -top-3.5 text-[13px] leading-none text-amber-400">
                         ✈
                       </span>
                     </div>
-                    <div className="w-2 h-2 rounded-full border-[2.5px] border-red-500 shrink-0" />
+                    <div className="w-2 h-2 rounded-full border-[2.5px] border-amber-400 shrink-0" />
                   </div>
                   {stops === 0 ? (
                     <span className="text-[10px] text-gray-400">Direct</span>
@@ -162,7 +162,7 @@ export default function FlightCard({ flight }: Props) {
 
                 {/* Arrival */}
                 <div className="text-center shrink-0">
-                  <p className="text-2xl font-extrabold text-gray-900 tabular-nums leading-none tracking-tight">
+                  <p className="text-2xl font-extrabold text-[#171717] tabular-nums leading-none tracking-tight">
                     {formatTime(lastSeg.arrivalTime)}
                   </p>
                   <p className="text-sm font-bold text-gray-700 mt-0.5">{lastSeg.destination}</p>
@@ -171,7 +171,7 @@ export default function FlightCard({ flight }: Props) {
 
                 {/* Cabin badge + flight numbers */}
                 <div className="w-24 shrink-0 text-right space-y-1.5">
-                  <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]">
+                  <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-400 text-[#0a0a0f] shadow-[0_2px_8px_rgba(251,191,36,0.30)]">
                     {firstSeg.cabinClass}
                   </span>
                   <p className="text-[10px] text-gray-400 leading-relaxed">
@@ -183,24 +183,24 @@ export default function FlightCard({ flight }: Props) {
               {/* Expandable segment breakdown */}
               {slice.segments.length > 1 && (
                 <details className="mt-4 group/det">
-                  <summary className="text-[11px] text-gray-400 cursor-pointer select-none hover:text-red-600 transition-colors list-none flex items-center gap-1.5 w-fit">
+                  <summary className="text-[11px] text-gray-400 cursor-pointer select-none hover:text-amber-500 transition-colors list-none flex items-center gap-1.5 w-fit">
                     <span className="group-open/det:hidden">▸</span>
                     <span className="hidden group-open/det:inline">▾</span>
                     View {slice.segments.length} segments
                   </summary>
 
-                  <div className="mt-3 ml-1 border-l-2 border-red-100 pl-3 space-y-0">
+                  <div className="mt-3 ml-1 border-l-2 border-amber-400/20 pl-3 space-y-0">
                     {slice.segments.map((seg, i) => (
                       <div key={i}>
                         {i > 0 && (
                           <div className="flex items-center gap-2 py-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-300" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-300" />
                             <span className="text-[10px] text-gray-400 italic">
                               Layover at {seg.origin}
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-3 py-2.5 rounded-xl px-2 hover:bg-red-50 transition-colors">
+                        <div className="flex items-center gap-3 py-2.5 rounded-xl px-2 hover:bg-amber-50 transition-colors">
                           <img
                             src={seg.airlineDetail.logo}
                             alt={seg.airlineDetail.name}
@@ -208,12 +208,12 @@ export default function FlightCard({ flight }: Props) {
                           />
                           <div className="flex-1 grid grid-cols-4 gap-2 text-xs items-center">
                             <div>
-                              <p className="font-bold text-gray-900 tabular-nums">{formatTime(seg.departureTime)}</p>
+                              <p className="font-bold text-[#171717] tabular-nums">{formatTime(seg.departureTime)}</p>
                               <p className="text-gray-400">{seg.origin} · {formatDate(seg.departureTime)}</p>
                             </div>
                             <div className="text-gray-200 text-center">—</div>
                             <div>
-                              <p className="font-bold text-gray-900 tabular-nums">{formatTime(seg.arrivalTime)}</p>
+                              <p className="font-bold text-[#171717] tabular-nums">{formatTime(seg.arrivalTime)}</p>
                               <p className="text-gray-400">{seg.destination} · {formatDate(seg.arrivalTime)}</p>
                             </div>
                             <div className="text-right text-gray-400">
