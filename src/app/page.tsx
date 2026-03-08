@@ -14,16 +14,21 @@ const SLIDES = [
     tag: "Top Destination",
     tagline: "Island of temples, sunsets, and endless paradise"
   }, { src: "/home/japan.jpg", city: "Kyoto", country: "Japan", tag: "Seasonal Pick", tagline: "Cherry blossoms await" },
-  { src: "/home/maldives.jpg", city: "Maldives", country: "Indian Ocean", tag: "Luxury Escape", tagline: "Crystal waters, endless calm" },
-];
+{ 
+  src: "/home/dubai.jpg",
+  city: "Dubai",
+  country: "United Arab Emirates",
+  tag: "Luxury City",
+  tagline: "Where futuristic skylines meet desert adventures"
+}];
 
 const DESTINATIONS = [
   { city: "Paris", country: "France", price: "$320", img: "/home/paris.jpg", temp: "18°C", tag: "Romance", color: "from-rose-100 to-pink-50" },
-  { city: "Bali", country: "Indonesia", price: "$540", img: "/home/bali.jpg", temp: "29°C", tag: "Beach", color: "from-cyan-100 to-sky-50" },
-  { city: "New York", country: "USA", price: "$410", img: "/home/nyc.jpg", temp: "15°C", tag: "City Break", color: "from-slate-100 to-gray-50" },
+  { city: "Moscow", country: "Russia", price: "$540", img: "/home/russia.jpg", temp: "29°C", tag: "Beach", color: "from-cyan-100 to-sky-50" },
+  { city: "New York", country: "USA", price: "$410", img: "/home/new-york.jpg", temp: "15°C", tag: "City Break", color: "from-slate-100 to-gray-50" },
   { city: "Dubai", country: "UAE", price: "$480", img: "/home/dubai.jpg", temp: "34°C", tag: "Luxury", color: "from-amber-100 to-yellow-50" },
-  { city: "Tokyo", country: "Japan", price: "$620", img: "/home/tokyo.jpg", temp: "22°C", tag: "Culture", color: "from-purple-100 to-violet-50" },
-  { city: "Cape Town", country: "S. Africa", price: "$580", img: "/home/capetown.jpg", temp: "20°C", tag: "Adventure", color: "from-orange-100 to-amber-50" },
+  { city: "Uttar Pradesh", country: "India", price: "$620", img: "/home/india.jpg", temp: "22°C", tag: "Culture", color: "from-purple-100 to-violet-50" },
+  { city: "Cape Town", country: "S. Africa", price: "$580", img: "/home/cape-town.jpg", temp: "20°C", tag: "Adventure", color: "from-orange-100 to-amber-50" },
 ];
 
 const DEALS = [
