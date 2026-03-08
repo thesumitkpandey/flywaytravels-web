@@ -31,8 +31,8 @@ const FlightSearchComponent = () => {
     setCabinClass,
   } = useFlightSearchStore();
 
-const [departureLocation, setDepartureLocation] = useState<Location | null>(null);
-const [destinationLocation, setDestinationLocation] = useState<Location | null>(null);
+  const [departureLocation, setDepartureLocation] = useState<Location | null>(null);
+  const [destinationLocation, setDestinationLocation] = useState<Location | null>(null);
 
   const [fareType, setFareType] = useState<"regular" | "student">("regular");
 
@@ -68,41 +68,63 @@ const [destinationLocation, setDestinationLocation] = useState<Location | null>(
       setLoadingAirports(false);
     }
   };
-
-  useEffect(() => {
-  const fetchAirportByCode = async (
-    code: string,
-    type: "departure" | "destination"
-  ) => {
-    try {
-      const res = await axiosInstance.get("/airports/search", {
-        params: { keyword: code },
-      });
-
-      const airport = res.data.data?.find(
-        (a: Location) => a.iataCode === code
-      );
-
-      if (!airport) return;
-
-      if (type === "departure") {
-        setDepartureLocation(airport);
-      } else {
-        setDestinationLocation(airport);
-      }
-    } catch (err) {
-      console.error("Airport fetch failed", err);
-    }
+  const disablePastDates = (current: dayjs.Dayjs) => {
+    return current && current < dayjs().startOf("day");
   };
 
-  if (departureAirport) {
-    fetchAirportByCode(departureAirport, "departure");
-  }
+  const disableReturnDates = (current: dayjs.Dayjs) => {
+    if (!journeyDate) return current && current < dayjs().startOf("day");
 
-  if (destinationAirport) {
-    fetchAirportByCode(destinationAirport, "destination");
-  }
-}, [departureAirport, destinationAirport]);
+    return (
+      current &&
+      (current < dayjs(journeyDate).startOf("day"))
+    );
+  };
+
+  useEffect(() => {
+    if (!journeyDate || !returnDate) return;
+
+    const journey = dayjs(journeyDate);
+    const ret = dayjs(returnDate);
+
+    if (ret.isBefore(journey)) {
+      setReturnDate(null);
+    }
+  }, [journeyDate, returnDate]);
+  useEffect(() => {
+    const fetchAirportByCode = async (
+      code: string,
+      type: "departure" | "destination"
+    ) => {
+      try {
+        const res = await axiosInstance.get("/airports/search", {
+          params: { keyword: code },
+        });
+
+        const airport = res.data.data?.find(
+          (a: Location) => a.iataCode === code
+        );
+
+        if (!airport) return;
+
+        if (type === "departure") {
+          setDepartureLocation(airport);
+        } else {
+          setDestinationLocation(airport);
+        }
+      } catch (err) {
+        console.error("Airport fetch failed", err);
+      }
+    };
+
+    if (departureAirport) {
+      fetchAirportByCode(departureAirport, "departure");
+    }
+
+    if (destinationAirport) {
+      fetchAirportByCode(destinationAirport, "destination");
+    }
+  }, [departureAirport, destinationAirport]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -127,17 +149,17 @@ const [destinationLocation, setDestinationLocation] = useState<Location | null>(
     return () => clearTimeout(t);
   }, [destinationSearch]);
 
-const handleSwapLocations = () => {
-  if (!departureLocation || !destinationLocation) return;
+  const handleSwapLocations = () => {
+    if (!departureLocation || !destinationLocation) return;
 
-  const temp = departureLocation;
+    const temp = departureLocation;
 
-  setDepartureLocation(destinationLocation);
-  setDestinationLocation(temp);
+    setDepartureLocation(destinationLocation);
+    setDestinationLocation(temp);
 
-  setDepartureAirport(destinationLocation.iataCode);
-  setDestinationAirport(temp.iataCode);
-};
+    setDepartureAirport(destinationLocation.iataCode);
+    setDestinationAirport(temp.iataCode);
+  };
 
   const getTotalPassengers = () => adultCount + childCount + infantCount;
 
@@ -183,21 +205,19 @@ const handleSwapLocations = () => {
         <div className="flex bg-gray-100 rounded-full p-1 gap-0.5">
           <button
             onClick={() => setIsRoundTrip(false)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-              !isRoundTrip
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${!isRoundTrip
                 ? "bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]"
                 : "text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             One Way
           </button>
           <button
             onClick={() => setIsRoundTrip(true)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-              isRoundTrip
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${isRoundTrip
                 ? "bg-red-600 text-white shadow-[0_2px_8px_rgba(227,24,55,0.3)]"
                 : "text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             Round Trip
           </button>
@@ -335,6 +355,7 @@ const handleSwapLocations = () => {
         <div className={`${fieldBoxBase}`} style={{ minWidth: 140 }}>
           <div className={fieldLabel}>Depart</div>
           <DatePicker
+            disabledDate={disablePastDates}
             value={journeyDate ? dayjs(journeyDate) : null}
             onChange={(date) => setJourneyDate(date ? date.toDate() : null)}
             format="DD MMM 'YY"
@@ -355,6 +376,7 @@ const handleSwapLocations = () => {
             <div className={`${fieldBoxBase}`} style={{ minWidth: 140 }}>
               <div className={fieldLabel}>Return</div>
               <DatePicker
+                disabledDate={disablePastDates}
                 value={returnDate ? dayjs(returnDate) : null}
                 onChange={(date) => setReturnDate(date ? date.toDate() : null)}
                 format="DD MMM 'YY"
@@ -456,11 +478,10 @@ const handleSwapLocations = () => {
                     <button
                       key={val}
                       onClick={() => setCabinClass(val)}
-                      className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all duration-150 ${
-                        cabinClass === val
+                      className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all duration-150 ${cabinClass === val
                           ? "border-red-600 bg-red-50 text-red-600"
                           : "border-gray-200 bg-white text-gray-500 hover:border-red-300 hover:text-red-500"
-                      }`}
+                        }`}
                     >
                       {label}
                     </button>
@@ -478,22 +499,20 @@ const handleSwapLocations = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setFareType("regular")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
-              fareType === "regular"
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${fareType === "regular"
                 ? "border-red-600 bg-red-50 text-red-600"
                 : "border-gray-200 bg-white text-gray-500 hover:border-red-300"
-            }`}
+              }`}
           >
             <User size={13} />
             Regular Fare
           </button>
           <button
             onClick={() => setFareType("student")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
-              fareType === "student"
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${fareType === "student"
                 ? "border-red-600 bg-red-50 text-red-600"
                 : "border-gray-200 bg-white text-gray-500 hover:border-red-300"
-            }`}
+              }`}
           >
             <GraduationCap size={13} />
             Student Fare
