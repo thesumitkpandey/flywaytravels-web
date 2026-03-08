@@ -1,51 +1,105 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #DA3A24; 
-}
+/*
+ * ── COLOR SYSTEM ─────────────────────────────────────────────────────────────
+ *
+ *  --background    #0a0a0f
+ *      → Page background, outermost wrappers, hero section base
+ *
+ *  --background-2  #111118
+ *      → Alternate section backgrounds, scrolled navbar fill,
+ *        stats strip, deals section, marquee strip, footer
+ *
+ *  --surface       #16161f
+ *      → Cards, search box, input fields, modals,
+ *        feature tiles, testimonial cards
+ *
+ *  --foreground    #ffffff
+ *      → All headings, body text, nav links, button text on dark bg
+ *      → Use at reduced opacity for muted/secondary text:
+ *          white/60  → secondary body text
+ *          white/40  → captions, descriptions, placeholders
+ *          white/30  → footer tagline, very subtle labels
+ *          white/25  → copyright, ghost text
+ *
+ *  --primary       #fbbf24  (amber-400)
+ *      → Primary CTA buttons, active tab states, prices & stat numbers,
+ *        star ratings, input focus borders, eyebrow labels above headings,
+ *        logo icon, active slide dots, card hover borders,
+ *        swap button icon & border, temperature badges
+ *
+ *  --primary-light #fde047  (yellow-300)
+ *      → Used ONLY as the gradient endpoint paired with --primary:
+ *          e.g. bg-gradient-to-r from-amber-400 to-yellow-300
+ *        Never use yellow-300 standalone
+ *
+ *  --danger        #ef4444  (red-500 / red-400)
+ *      → Scarcity & urgency signals ONLY:
+ *          "Only X seats left" warning text  → text-red-400
+ *          "SAVE X%" sale badge background   → bg-red-500
+ *        Never use for buttons, nav, or decorative elements
+ *
+ *  --success       #34d399  (emerald-400)
+ *      → Positive status indicators ONLY:
+ *          Booking confirmed status
+ *          Success messages or checkmarks
+ *
+ * ── BORDERS & DIVIDERS ───────────────────────────────────────────────────────
+ *
+ *  white/[0.06]      → Section dividers, navbar border, footer hr
+ *  white/[0.08]      → Default card and input borders
+ *  white/[0.10]      → Slightly more visible input borders
+ *  amber-400/10–30   → Primary-tinted borders on hover states and banners
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 
-/* Prevent accidental horizontal scroll */
-html, body {
-  max-width: 100%;
-  margin: 0;
-  overflow-x: hidden;
+:root {
+  --background:    #0a0a0f;
+  --background-2:  #111118;
+  --surface:       #16161f;
+  --foreground:    #ffffff;
+  --primary:       #fbbf24;
+  --primary-light: #fde047;
+  --danger:        #ef4444;
+  --success:       #34d399;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-primary: #DA3A24;
+  --color-background:    var(--background);
+  --color-background-2:  var(--background-2);
+  --color-surface:       var(--surface);
+  --color-foreground:    var(--foreground);
+  --color-primary:       var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-danger:        var(--danger);
+  --color-success:       var(--success);
+  --font-sans:           var(--font-geist-sans);
+  --font-mono:           var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base ── */
+html,
 body {
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'DM Sans', Arial, Helvetica, sans-serif;
 }
 
-.trip-type-radio .ant-radio-button-wrapper-checked {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: white !important;
-}
+/* ── Ant Design: Trip Type Radio ── */
 
+/* Active/checked → primary amber with dark text */
+.trip-type-radio .ant-radio-button-wrapper-checked,
 .trip-type-radio .ant-radio-button-wrapper-checked:hover {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: white !important;
+  background-color: var(--primary)    !important;
+  border-color:     var(--primary)    !important;
+  color:            var(--background) !important;
 }
 
+/* Idle hover → full foreground text */
 .trip-type-radio .ant-radio-button-wrapper:hover {
-  color: black;
+  color: var(--foreground);
 }
