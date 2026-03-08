@@ -7,44 +7,49 @@ import FlightSearchComponent from "@/component/search";
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SLIDES = [
-  { src: "/home/hero.jpg",  city: "Santorini", country: "Greece",       tag: "Trending",      tagline: "Where the sea meets the sky" },
-  { src: "/home/hero2.jpg", city: "Kyoto",     country: "Japan",        tag: "Seasonal Pick", tagline: "Cherry blossoms await" },
-  { src: "/home/hero3.jpg", city: "Maldives",  country: "Indian Ocean", tag: "Luxury Escape", tagline: "Crystal waters, endless calm" },
+  {
+    src: "/home/bali.jpg",
+    city: "Bali",
+    country: "Indonesia",
+    tag: "Top Destination",
+    tagline: "Island of temples, sunsets, and endless paradise"
+  }, { src: "/home/japan.jpg", city: "Kyoto", country: "Japan", tag: "Seasonal Pick", tagline: "Cherry blossoms await" },
+  { src: "/home/maldives.jpg", city: "Maldives", country: "Indian Ocean", tag: "Luxury Escape", tagline: "Crystal waters, endless calm" },
 ];
 
 const DESTINATIONS = [
-  { city: "Paris",     country: "France",    price: "$320", img: "/home/paris.jpg",    temp: "18°C", tag: "Romance",   color: "from-rose-100 to-pink-50" },
-  { city: "Bali",      country: "Indonesia", price: "$540", img: "/home/bali.jpg",     temp: "29°C", tag: "Beach",     color: "from-cyan-100 to-sky-50" },
-  { city: "New York",  country: "USA",       price: "$410", img: "/home/nyc.jpg",      temp: "15°C", tag: "City Break",color: "from-slate-100 to-gray-50" },
-  { city: "Dubai",     country: "UAE",       price: "$480", img: "/home/dubai.jpg",    temp: "34°C", tag: "Luxury",    color: "from-amber-100 to-yellow-50" },
-  { city: "Tokyo",     country: "Japan",     price: "$620", img: "/home/tokyo.jpg",    temp: "22°C", tag: "Culture",   color: "from-purple-100 to-violet-50" },
+  { city: "Paris", country: "France", price: "$320", img: "/home/paris.jpg", temp: "18°C", tag: "Romance", color: "from-rose-100 to-pink-50" },
+  { city: "Bali", country: "Indonesia", price: "$540", img: "/home/bali.jpg", temp: "29°C", tag: "Beach", color: "from-cyan-100 to-sky-50" },
+  { city: "New York", country: "USA", price: "$410", img: "/home/nyc.jpg", temp: "15°C", tag: "City Break", color: "from-slate-100 to-gray-50" },
+  { city: "Dubai", country: "UAE", price: "$480", img: "/home/dubai.jpg", temp: "34°C", tag: "Luxury", color: "from-amber-100 to-yellow-50" },
+  { city: "Tokyo", country: "Japan", price: "$620", img: "/home/tokyo.jpg", temp: "22°C", tag: "Culture", color: "from-purple-100 to-violet-50" },
   { city: "Cape Town", country: "S. Africa", price: "$580", img: "/home/capetown.jpg", temp: "20°C", tag: "Adventure", color: "from-orange-100 to-amber-50" },
 ];
 
 const DEALS = [
-  { from: "JFK", fromCity: "New York",    to: "LHR", toCity: "London", airline: "British Airways", price: "$299", oldPrice: "$520", date: "Dec 15 – Dec 22", seats: 4,  duration: "7h 10m" },
-  { from: "LAX", fromCity: "Los Angeles", to: "NRT", toCity: "Tokyo",  airline: "ANA",             price: "$480", oldPrice: "$760", date: "Jan 5 – Jan 14",  seats: 9,  duration: "11h 45m" },
-  { from: "ORD", fromCity: "Chicago",     to: "CDG", toCity: "Paris",  airline: "Air France",      price: "$340", oldPrice: "$590", date: "Feb 1 – Feb 8",   seats: 2,  duration: "9h 05m" },
+  { from: "JFK", fromCity: "New York", to: "LHR", toCity: "London", airline: "British Airways", price: "$299", oldPrice: "$520", date: "Dec 15 – Dec 22", seats: 4, duration: "7h 10m" },
+  { from: "LAX", fromCity: "Los Angeles", to: "NRT", toCity: "Tokyo", airline: "ANA", price: "$480", oldPrice: "$760", date: "Jan 5 – Jan 14", seats: 9, duration: "11h 45m" },
+  { from: "ORD", fromCity: "Chicago", to: "CDG", toCity: "Paris", airline: "Air France", price: "$340", oldPrice: "$590", date: "Feb 1 – Feb 8", seats: 2, duration: "9h 05m" },
 ];
 
 const FEATURES = [
   { icon: "💸", title: "Best Price Guarantee", desc: "We match any lower fare you find within 24 hours of booking.", accent: "bg-amber-50 border-amber-100" },
-  { icon: "⚡", title: "Instant Booking",       desc: "Confirm your seat in under 60 seconds with our streamlined checkout.", accent: "bg-sky-50 border-sky-100" },
-  { icon: "🔄", title: "Free Rebooking",        desc: "Modify your flight up to 48 hours before departure at no cost.", accent: "bg-emerald-50 border-emerald-100" },
-  { icon: "🛡️", title: "Travel Protection",    desc: "Built-in cancellation cover and 24/7 emergency assistance.", accent: "bg-purple-50 border-purple-100" },
+  { icon: "⚡", title: "Instant Booking", desc: "Confirm your seat in under 60 seconds with our streamlined checkout.", accent: "bg-sky-50 border-sky-100" },
+  { icon: "🔄", title: "Free Rebooking", desc: "Modify your flight up to 48 hours before departure at no cost.", accent: "bg-emerald-50 border-emerald-100" },
+  { icon: "🛡️", title: "Travel Protection", desc: "Built-in cancellation cover and 24/7 emergency assistance.", accent: "bg-purple-50 border-purple-100" },
 ];
 
 const TESTIMONIALS = [
-  { name: "Sophia Larkin", role: "Travel Blogger",    text: "Found a deal 40% cheaper than anywhere else. I was on my flight to Rome within minutes of deciding!", initials: "SL", color: "bg-rose-500" },
-  { name: "Marcus Tan",    role: "Business Traveler", text: "The interface is lightning-fast and the filters actually work. My go-to for every business trip.", initials: "MT", color: "bg-sky-500" },
-  { name: "Priya Nair",    role: "Frequent Flyer",    text: "Customer support responded in under 2 minutes when I needed to reschedule. Absolutely world class.", initials: "PN", color: "bg-violet-500" },
+  { name: "Sophia Larkin", role: "Travel Blogger", text: "Found a deal 40% cheaper than anywhere else. I was on my flight to Rome within minutes of deciding!", initials: "SL", color: "bg-rose-500" },
+  { name: "Marcus Tan", role: "Business Traveler", text: "The interface is lightning-fast and the filters actually work. My go-to for every business trip.", initials: "MT", color: "bg-sky-500" },
+  { name: "Priya Nair", role: "Frequent Flyer", text: "Customer support responded in under 2 minutes when I needed to reschedule. Absolutely world class.", initials: "PN", color: "bg-violet-500" },
 ];
 
 const AIRLINES = ["Emirates", "Singapore Air", "Qatar Airways", "Lufthansa", "ANA", "Cathay Pacific", "Delta", "Air France"];
 
 const STATS = [
   { n: "500+", label: "Destinations" },
-  { n: "2M+",  label: "Happy Travelers" },
+  { n: "2M+", label: "Happy Travelers" },
   { n: "150+", label: "Partner Airlines" },
   { n: "4.9★", label: "App Rating" },
 ];
@@ -148,7 +153,7 @@ function DealCard({ d }: { d: typeof DEALS[0] }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const [slide, setSlide]   = useState(0);
+  const [slide, setSlide] = useState(0);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
