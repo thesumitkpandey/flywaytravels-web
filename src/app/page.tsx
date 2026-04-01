@@ -206,7 +206,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
 
         {/* Slide text content — fades with slide */}
-        <div className={`absolute bottom-0 left-0 right-0 z-10 px-6 md:px-16 pb-10 transition-all duration-[400ms] ${fading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}>
+        <div className={`absolute bottom-0 left-0 right-0 z-10 px-6 md:px-16 pb-[320px] transition-all duration-[400ms] ${fading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}>
 
           {/* Tag */}
           <span className="inline-block bg-amber-400 text-[#0a0a0f] text-[10px] font-black tracking-[0.25em] uppercase px-4 py-1.5 rounded-full mb-4">
