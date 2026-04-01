@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -50,15 +51,21 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-16 py-12 flex flex-col md:flex-row items-center justify-between gap-10">
 
           {/* Brand statement */}
-          <div className="max-w-sm">
-            <div className="flex items-center gap-2.5 mb-3">
-              <span className="text-amber-400 text-2xl">✈</span>
-              <span className="text-white font-bold text-2xl tracking-[0.2em]">AEROFLY</span>
-            </div>
-            <p className="text-white/40 text-sm leading-relaxed">
-              Connecting people to the places they love — with the best prices, the fastest booking, and support that never sleeps.
-            </p>
-          </div>
+{/* Brand statement */}
+<div className="max-w-sm">
+  <Link href="/" className="flex items-center mb-4">
+    <Image
+      src="/logo.png"
+      alt="Flyway"
+      width={160} // Slightly smaller than navbar for footer balance
+      height={45}
+      className="object-contain brightness-0 invert" // Optional: force logo to white if it's dark
+    />
+  </Link>
+  <p className="text-white/40 text-sm leading-relaxed">
+    Connecting people to the places they love — with the best prices, the fastest booking, and support that never sleeps.
+  </p>
+</div>
 
           {/* Divider (desktop) */}
           <div className="hidden md:block w-px h-16 bg-white/[0.08]" />
@@ -129,7 +136,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <p className="text-white/25 text-xs tracking-wide">
-          © 2025 Aerofly Inc. All rights reserved.
+          © 2025 FlyWay Inc. All rights reserved.
         </p>
 
         {/* Payment icons */}
