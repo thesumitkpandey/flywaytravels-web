@@ -2,20 +2,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useFlightStore } from "@/store/flight.store";
-import { cabinClass as CabinClassType } from "@/types/flight";
+import { Airport, cabinClass as CabinClassType } from "@/types/flight";
 import { ArrowLeftRight, ChevronDown, Trash2, Plane } from "lucide-react";
 import { DatePicker, Input, Button } from "antd";
 import dayjs from "dayjs";
+import axiosInstance from "@/provider/axios";
 
-const flightAirports = [
-  { code: "DEL", city: "Delhi", name: "Indira Gandhi International Airport" },
-  { code: "BOM", city: "Mumbai", name: "Chhatrapati Shivaji Maharaj Airport" },
-  { code: "BLR", city: "Bengaluru", name: "Kempegowda International Airport" },
-  { code: "DXB", city: "Dubai", name: "Dubai International Airport" },
-  { code: "JFK", city: "New York", name: "John F. Kennedy International Airport" },
-  { code: "LHR", city: "London", name: "Heathrow Airport" },
-  { code: "SIN", city: "Singapore", name: "Changi Airport" },
-];
 
 const FlightSearchComponent = () => {
   const {
@@ -34,17 +26,38 @@ const FlightSearchComponent = () => {
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<"from" | "to" | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [airports, setAirports] = useState<Airport[]>([]);
+  const [loading, setLoading] = useState(false);
   const passengerRef = useRef<HTMLDivElement>(null);
   const fromRef = useRef<HTMLDivElement>(null);
   const toRef = useRef<HTMLDivElement>(null);
+  const filteredAirports = airports;
+  useEffect(() => {
+    if (!searchQuery) {
+      setAirports([]);
+      return;
+    }
 
-  const filteredAirports = flightAirports.filter(
-    (a) =>
-      a.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    const fetchAirports = async () => {
+      try {
+        setLoading(true);
 
+        const res = await axiosInstance.get("/v1/airports/search", {
+          params: { keyword: searchQuery }, // ✅ cleaner than string concat
+        });
+
+        setAirports(res.data.data || []);
+      } catch (err) {
+        console.error("Airport fetch error", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounce = setTimeout(fetchAirports, 400);
+    return () => clearTimeout(debounce);
+  }, [searchQuery]);
+  console.log("these are the states", slices)
   const handleTripTypeChange = (type: "oneWay" | "roundTrip") => {
     if (type === "oneWay") {
       setSlices([slices[0]]);
@@ -75,10 +88,10 @@ const FlightSearchComponent = () => {
     }
   };
 
-  const handleSelectAirport = (airport: typeof flightAirports[0], type: "from" | "to") => {
-    const updateData = type === "from" 
-      ? { origin: airport.code, originAirportCity: airport.city, originAirportName: airport.name }
-      : { destination: airport.code, destinationAirportCity: airport.city, destinationAirportName: airport.name };
+  const handleSelectAirport = (airport: Airport, type: "from" | "to") => {
+    const updateData = type === "from"
+      ? { origin: airport.iataCode, originAirportCity: airport.cityName, originAirportName: airport.airportName }
+      : { destination: airport.iataCode, destinationAirportCity: airport.cityName, destinationAirportName: airport.airportName };
 
     updateSlice(0, updateData);
     setActiveDropdown(null);
@@ -111,10 +124,9 @@ const FlightSearchComponent = () => {
 
   const fieldBoxBase = "bg-white border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer transition-all duration-200 hover:border-amber-400 relative min-w-0";
   const fieldLabel = "text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-0.5";
-  console.log("these are the status", slices, passengers, cabinClass)
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] p-6 font-sans">
-      
+
       {/* ── Header: Trip Type (Left) and Cabin Class (Right) ── */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex bg-gray-100 rounded-full p-1">
@@ -122,9 +134,8 @@ const FlightSearchComponent = () => {
             <button
               key={t}
               onClick={() => handleTripTypeChange(t as any)}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                (t === "oneWay" ? !isRoundTrip : isRoundTrip) ? "bg-amber-400 text-black shadow-sm" : "text-gray-400 hover:text-gray-600"
-              }`}
+              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${(t === "oneWay" ? !isRoundTrip : isRoundTrip) ? "bg-amber-400 text-black shadow-sm" : "text-gray-400 hover:text-gray-600"
+                }`}
             >
               {t === "oneWay" ? "One Way" : "Round Trip"}
             </button>
@@ -136,9 +147,8 @@ const FlightSearchComponent = () => {
             <button
               key={cat}
               onClick={() => setCabinClass(cat as any)}
-              className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all border ${
-                cabinClass === cat ? "bg-amber-400 border-amber-400 text-black shadow-sm" : "bg-white border-gray-200 text-gray-400 hover:border-amber-200"
-              }`}
+              className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all border ${cabinClass === cat ? "bg-amber-400 border-amber-400 text-black shadow-sm" : "bg-white border-gray-200 text-gray-400 hover:border-amber-200"
+                }`}
             >
               {formatLabel(cat)}
             </button>
@@ -148,13 +158,13 @@ const FlightSearchComponent = () => {
 
       {/* ── Main Search Row ── */}
       <div className="flex items-stretch gap-2 flex-wrap lg:flex-nowrap">
-        
+
         {/* FROM */}
         <div className={`${fieldBoxBase} flex-1 min-w-[240px] ${activeDropdown === "from" ? "border-amber-400" : ""}`} ref={fromRef}>
           <div className={fieldLabel}>From</div>
           <div onClick={() => handleStartSearch("from")} className="min-h-[44px] flex flex-col justify-center">
             {activeDropdown === "from" ? (
-              <Input 
+              <Input
                 variant="borderless"
                 autoFocus
                 className="!p-0 !text-2xl !font-bold !text-black placeholder:text-gray-300"
@@ -176,15 +186,15 @@ const FlightSearchComponent = () => {
           {activeDropdown === "from" && (
             <div className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[320px] bg-white border border-gray-100 rounded-xl shadow-2xl z-[60] py-2">
               {filteredAirports.map((a) => (
-                <div key={a.code} className="px-4 py-3 hover:bg-amber-50 cursor-pointer flex items-center justify-between group" onMouseDown={(e) => { e.preventDefault(); handleSelectAirport(a, "from"); }}>
+                <div key={a.iataCode} className="px-4 py-3 hover:bg-amber-50 cursor-pointer flex items-center justify-between group" onMouseDown={(e) => { e.preventDefault(); handleSelectAirport(a, "from"); }}>
                   <div className="flex items-center gap-3">
                     <Plane size={14} className="text-gray-300 group-hover:text-amber-500" />
                     <div>
-                      <div className="text-sm font-bold text-gray-800">{a.city}</div>
-                      <div className="text-[10px] text-gray-400 truncate max-w-[200px]">{a.name}</div>
+                      <div className="text-sm font-bold text-gray-800">{a.cityName}</div>
+                      <div className="text-[10px] text-gray-400 truncate max-w-[200px]">{a.airportName}</div>
                     </div>
                   </div>
-                  <div className="text-xs font-black text-gray-200 group-hover:text-amber-500">{a.code}</div>
+                  <div className="text-xs font-black text-gray-200 group-hover:text-amber-500">{a.iataCode}</div>
                 </div>
               ))}
             </div>
@@ -200,7 +210,7 @@ const FlightSearchComponent = () => {
           <div className={fieldLabel}>To</div>
           <div onClick={() => handleStartSearch("to")} className="min-h-[44px] flex flex-col justify-center">
             {activeDropdown === "to" ? (
-              <Input 
+              <Input
                 variant="borderless"
                 autoFocus
                 className="!p-0 !text-2xl !font-bold !text-black placeholder:text-gray-300"
@@ -222,15 +232,15 @@ const FlightSearchComponent = () => {
           {activeDropdown === "to" && (
             <div className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[320px] bg-white border border-gray-100 rounded-xl shadow-2xl z-[60] py-2">
               {filteredAirports.map((a) => (
-                <div key={a.code} className="px-4 py-3 hover:bg-amber-50 cursor-pointer flex items-center justify-between group" onMouseDown={(e) => { e.preventDefault(); handleSelectAirport(a, "to"); }}>
+                <div key={a.iataCode} className="px-4 py-3 hover:bg-amber-50 cursor-pointer flex items-center justify-between group" onMouseDown={(e) => { e.preventDefault(); handleSelectAirport(a, "to"); }}>
                   <div className="flex items-center gap-3">
                     <Plane size={14} className="text-gray-300 group-hover:text-amber-500" />
                     <div>
-                      <div className="text-sm font-bold text-gray-800">{a.city}</div>
-                      <div className="text-[10px] text-gray-400 truncate max-w-[200px]">{a.name}</div>
+                      <div className="text-sm font-bold text-gray-800">{a.cityName}</div>
+                      <div className="text-[10px] text-gray-400 truncate max-w-[200px]">{a.airportName}</div>
                     </div>
                   </div>
-                  <div className="text-xs font-black text-gray-200 group-hover:text-amber-500">{a.code}</div>
+                  <div className="text-xs font-black text-gray-200 group-hover:text-amber-500">{a.iataCode}</div>
                 </div>
               ))}
             </div>
@@ -240,25 +250,25 @@ const FlightSearchComponent = () => {
         {/* DATES */}
         <div className={`${fieldBoxBase} min-w-[160px]`}>
           <div className={fieldLabel}>Depart</div>
-          <DatePicker 
-            value={slices[0]?.departureDate ? dayjs(slices[0].departureDate) : null} 
-            onChange={(date) => updateSlice(0, { departureDate: date?.format("YYYY-MM-DD") })} 
-            format="DD MMM 'YY" 
-            variant="borderless" 
-            className="!p-0 w-full [&_input]:!text-lg [&_input]:!font-bold [&_input]:!text-black" 
-            allowClear={false} 
+          <DatePicker
+            value={slices[0]?.departureDate ? dayjs(slices[0].departureDate) : null}
+            onChange={(date) => updateSlice(0, { departureDate: date?.format("YYYY-MM-DD") })}
+            format="DD MMM 'YY"
+            variant="borderless"
+            className="!p-0 w-full [&_input]:!text-lg [&_input]:!font-bold [&_input]:!text-black"
+            allowClear={false}
           />
         </div>
 
         {isRoundTrip ? (
           <div className={`${fieldBoxBase} min-w-[160px]`}>
             <div className={fieldLabel}>Return</div>
-            <DatePicker 
-              value={slices[1]?.departureDate ? dayjs(slices[1].departureDate) : null} 
-              onChange={(date) => updateSlice(1, { departureDate: date?.format("YYYY-MM-DD") })} 
-              format="DD MMM 'YY" 
-              variant="borderless" 
-              className="!p-0 w-full [&_input]:!text-lg [&_input]:!font-bold [&_input]:!text-black" 
+            <DatePicker
+              value={slices[1]?.departureDate ? dayjs(slices[1].departureDate) : null}
+              onChange={(date) => updateSlice(1, { departureDate: date?.format("YYYY-MM-DD") })}
+              format="DD MMM 'YY"
+              variant="borderless"
+              className="!p-0 w-full [&_input]:!text-lg [&_input]:!font-bold [&_input]:!text-black"
             />
           </div>
         ) : (
@@ -285,9 +295,9 @@ const FlightSearchComponent = () => {
               <div className="max-h-40 overflow-y-auto space-y-2 mb-4">
                 {passengers.map((p, idx) => (
                   <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                    <DatePicker 
-                      variant="borderless" 
-                      placeholder="DOB" 
+                    <DatePicker
+                      variant="borderless"
+                      placeholder="DOB"
                       size="small"
                       className="flex-1 !p-0 !text-xs font-bold"
                       value={p.bornOn ? dayjs(p.bornOn) : null}

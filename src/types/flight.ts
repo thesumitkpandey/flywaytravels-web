@@ -22,3 +22,9 @@ export type slice = {
   originAirportCity?: string;
   destinationAirportCity?: string;
 };
+
+export type Airport = {
+  iataCode: string;
+  airportName: string;
+  cityName: string;
+}
