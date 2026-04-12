@@ -16,22 +16,19 @@ const SEARCH_PAYLOAD: SearchRequestPayload = {
       departureDate: "2026-09-12",
     },
   ],
-  passengers: [
-    { bornOn: "1990-01-15" },
-    { bornOn: "1992-06-22" },
-  ],
+  passengers: [{ bornOn: "1990-01-15" }, { bornOn: "1992-06-22" }],
 };
 
 // ── API CALL ───────────────────────────────────────────────────────────
 async function fetchFlights(): Promise<FlightOffer[]> {
   try {
-    const {data} = await axiosInstance.post<
-      GlobalApiResponse<{ offers: FlightOffer[] }>
-    >("/v1/flights/search", SEARCH_PAYLOAD);
-
-    return data.data.offers ?? [];
-  } catch (err) {
-    console.error("Failed to fetch flights:", err);
+    const res = await axiosInstance.post<FlightOffer[]>(
+      "/v1/flights/search",
+      SEARCH_PAYLOAD,
+    );
+    return res ?? [];
+  } catch (err: any) {
+    console.error("Failed to fetch flights:", err.message);
     throw err;
   }
 }
@@ -57,12 +54,6 @@ export default function ResultsPage() {
 
     loadFlights();
   }, []);
-  console.log(offers, "these are offers")
-  return (
-    <FlightResults
-      offers={offers}      // ✅ FIXED
-      isLoading={loading}  // ✅ dynamic
-      error={error}
-    />
-  );
+  console.log(offers, "these are offers");
+  return <FlightResults offers={offers} isLoading={loading} error={error} />;
 }
