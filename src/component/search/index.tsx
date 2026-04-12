@@ -7,7 +7,7 @@ import { ArrowLeftRight, ChevronDown, Trash2, Plane } from "lucide-react";
 import { DatePicker, Input, Button } from "antd";
 import dayjs from "dayjs";
 import axiosInstance from "@/provider/axios";
-
+import { useRouter } from "next/navigation";
 const FlightSearchComponent = () => {
   const {
     slices,
@@ -33,6 +33,7 @@ const FlightSearchComponent = () => {
   const fromRef = useRef<HTMLDivElement>(null);
   const toRef = useRef<HTMLDivElement>(null);
   const filteredAirports = airports;
+  const router = useRouter();
   useEffect(() => {
     if (!searchQuery) {
       setAirports([]);
@@ -127,23 +128,9 @@ const FlightSearchComponent = () => {
       destinationAirportCity: s1.originAirportCity,
     });
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        passengerRef.current &&
-        !passengerRef.current.contains(e.target as Node)
-      )
-        setShowPassengerDropdown(false);
-      if (fromRef.current && !fromRef.current.contains(e.target as Node))
-        setActiveDropdown(null);
-      if (toRef.current && !toRef.current.contains(e.target as Node))
-        setActiveDropdown(null);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  const handleSearchFlights = () => {
+    router.push("/flights");
+  };
   const formatLabel = (text: string) =>
     text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
 
@@ -380,28 +367,37 @@ const FlightSearchComponent = () => {
         )}
 
         {/* TRAVELLERS */}
+        {/* TRAVELLERS */}
         <div className={`${fieldBoxBase} min-w-[180px]`} ref={passengerRef}>
           <div className={fieldLabel}>Travellers</div>
+
           <div
             className="flex items-center justify-between"
-            onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+            onClick={() => setShowPassengerDropdown((s) => !s)}
           >
             <div className="text-lg font-bold">
               {passengers.length || 1}{" "}
               <span className="text-sm text-gray-400 font-medium">Pax</span>
             </div>
+
             <ChevronDown
               size={16}
-              className={`text-gray-400 transition-transform ${showPassengerDropdown ? "rotate-180" : ""}`}
+              className={`text-gray-400 transition-transform ${
+                showPassengerDropdown ? "rotate-180" : ""
+              }`}
             />
           </div>
 
           {showPassengerDropdown && (
-            <div className="absolute top-[calc(100%+8px)] right-0 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl p-5 z-50">
+            <div
+              className="absolute top-[calc(100%+8px)] right-0 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl p-5 z-50"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-center mb-4 border-b pb-2">
                 <span className="font-bold text-gray-700 text-sm">
                   Pax List
                 </span>
+
                 <Button
                   size="small"
                   type="primary"
@@ -411,6 +407,7 @@ const FlightSearchComponent = () => {
                   + ADD
                 </Button>
               </div>
+
               <div className="max-h-40 overflow-y-auto space-y-2 mb-4">
                 {passengers.map((p, idx) => (
                   <div
@@ -423,12 +420,14 @@ const FlightSearchComponent = () => {
                       size="small"
                       className="flex-1 !p-0 !text-xs font-bold"
                       value={p.bornOn ? dayjs(p.bornOn) : null}
+                      getPopupContainer={(trigger) => trigger.parentElement!}
                       onChange={(date) =>
                         updatePassenger(idx, {
                           bornOn: date?.format("YYYY-MM-DD"),
                         })
                       }
                     />
+
                     <Trash2
                       size={14}
                       className="text-gray-300 hover:text-red-500 cursor-pointer"
@@ -443,7 +442,10 @@ const FlightSearchComponent = () => {
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button className="!bg-amber-400 !text-black !font-bold !h-auto !px-16 !py-4 !rounded-xl !border-none shadow-lg shadow-amber-200 hover:!bg-amber-500 hover:!-translate-y-0.5 transition-all">
+        <Button
+          onClick={handleSearchFlights}
+          className="!bg-amber-400 !text-black !font-bold !h-auto !px-16 !py-4 !rounded-xl !border-none shadow-lg shadow-amber-200 hover:!bg-amber-500 hover:!-translate-y-0.5 transition-all"
+        >
           Search Flights
         </Button>
       </div>
