@@ -4,10 +4,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { useFlightStore } from "@/store/flight.store";
 import { Airport, cabinClass as CabinClassType } from "@/types/flight";
 import { ArrowLeftRight, ChevronDown, Trash2, Plane } from "lucide-react";
-import { DatePicker, Input, Button } from "antd";
+import { DatePicker, Input, Button, message } from "antd";
 import dayjs from "dayjs";
+import { createPortal } from "react-dom";
 import axiosInstance from "@/provider/axios";
 import { useRouter } from "next/navigation";
+
 const FlightSearchComponent = () => {
   const {
     slices,
@@ -28,6 +30,7 @@ const isRoundTrip = tripType === "roundTrip";
   const [activeDropdown, setActiveDropdown] = useState<"from" | "to" | null>(
     null,
   );
+  const [passengerDropdownPos, setPassengerDropdownPos] = useState<{ top: number; right: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [airports, setAirports] = useState<Airport[]>([]);
   const [loading, setLoading] = useState(false);
@@ -136,10 +139,36 @@ const handleSearchFlights = () => {
   const finalSlices =
     tripType === "oneWay" ? [slices[0]] : slices.slice(0, 2);
 
-  // optional: update store to be safe
-  setSlices(finalSlices);
+  // ✅ 1. Passenger validation
+  if (!passengers || passengers.length === 0) {
+    message.error("Please add at least one passenger");
+    return;
+  }
 
-  console.log("FINAL SLICES", finalSlices);
+  // ✅ 2. Slice validation
+  if (!finalSlices || finalSlices.length === 0) {
+    message.error("Please add at least one trip");
+    return;
+  }
+
+  // ✅ 3. Slice fields validation
+  const invalidSlice = finalSlices.find(
+    (s) => !s.origin || !s.destination || !s.departureDate
+  );
+
+  if (invalidSlice) {
+    message.error("Please fill origin, destination and departure date");
+    return;
+  }
+
+  // ✅ 4. Round trip return date validation
+  if (tripType === "roundTrip" && !finalSlices[1]?.departureDate) {
+    message.error("Please select return date");
+    return;
+  }
+
+  // ✅ Passed → proceed
+  setSlices(finalSlices);
 
   router.push("/flights");
 };
@@ -385,8 +414,16 @@ const handleSearchFlights = () => {
 
           <div
             className="flex items-center justify-between"
-            onClick={() => setShowPassengerDropdown((s) => !s)}
-          >
+onClick={() => {
+  if (!showPassengerDropdown && passengerRef.current) {
+    const rect = passengerRef.current.getBoundingClientRect();
+    setPassengerDropdownPos({
+      top: rect.bottom + window.scrollY + 8,
+      right: window.innerWidth - rect.right,
+    });
+  }
+  setShowPassengerDropdown((s) => !s);
+}}          >
             <div className="text-lg font-bold">
               {passengers.length || 1}{" "}
               <span className="text-sm text-gray-400 font-medium">Pax</span>
@@ -400,56 +437,66 @@ const handleSearchFlights = () => {
             />
           </div>
 
-          {showPassengerDropdown && (
-            <div
-              className="absolute top-[calc(100%+8px)] right-0 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl p-5 z-50"
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-4 border-b pb-2">
-                <span className="font-bold text-gray-700 text-sm">
-                  Pax List
-                </span>
+{showPassengerDropdown && passengerDropdownPos &&
+  createPortal(
+    <div
+      style={{ top: passengerDropdownPos.top, right: passengerDropdownPos.right, position: "absolute" }}
+      className="w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl z-[9999] overflow-hidden"
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          Passengers
+        </span>
+        <button
+          onClick={() => addPassenger({ bornOn: "" })}
+          className="w-6 h-6 rounded-full bg-amber-400 text-black font-bold text-sm flex items-center justify-center hover:bg-amber-500 transition-all"
+        >
+          +
+        </button>
+      </div>
 
-                <Button
-                  size="small"
-                  type="primary"
-                  className="!bg-amber-400 !text-black !border-none !text-[10px] font-bold"
-                  onClick={() => addPassenger({ bornOn: "" })}
-                >
-                  + ADD
-                </Button>
-              </div>
+      <div className="max-h-48 overflow-y-auto px-4 py-3 space-y-2">
+        {passengers.map((p, idx) => (
+          <div key={idx} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+            <span className="text-xs text-gray-400 font-semibold w-4">{idx + 1}</span>
+            <DatePicker
+              variant="borderless"
+              placeholder="Date of Birth"
+              size="small"
+              className="flex-1 !p-0 !text-xs font-bold"
+              value={p.bornOn ? dayjs(p.bornOn) : null}
+              getPopupContainer={() => document.body}
+              onChange={(date) => updatePassenger(idx, { bornOn: date?.format("YYYY-MM-DD") })}
+            />
+            <Trash2
+              size={13}
+              className="text-gray-300 hover:text-red-400 cursor-pointer flex-shrink-0 transition-colors"
+              onClick={() => removePassenger(idx)}
+            />
+          </div>
+        ))}
+      </div>
 
-              <div className="max-h-40 overflow-y-auto space-y-2 mb-4">
-                {passengers.map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
-                  >
-                    <DatePicker
-                      variant="borderless"
-                      placeholder="DOB"
-                      size="small"
-                      className="flex-1 !p-0 !text-xs font-bold"
-                      value={p.bornOn ? dayjs(p.bornOn) : null}
-                      getPopupContainer={(trigger) => trigger.parentElement!}
-                      onChange={(date) =>
-                        updatePassenger(idx, {
-                          bornOn: date?.format("YYYY-MM-DD"),
-                        })
-                      }
-                    />
-
-                    <Trash2
-                      size={14}
-                      className="text-gray-300 hover:text-red-500 cursor-pointer"
-                      onClick={() => removePassenger(idx)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+      <div className="flex border-t border-gray-100">
+        <button
+          onClick={() => setShowPassengerDropdown(false)}
+          className="flex-1 py-3 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <div className="w-px bg-gray-100" />
+        <button
+          onClick={() => setShowPassengerDropdown(false)}
+          className="flex-1 py-3 text-sm font-bold text-black bg-amber-400 hover:bg-amber-500 transition-colors"
+        >
+          Done
+        </button>
+      </div>
+    </div>,
+    document.body
+  )
+}
         </div>
       </div>
 

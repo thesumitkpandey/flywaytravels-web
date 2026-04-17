@@ -616,9 +616,7 @@ useEffect(() => {
       const res = await axiosInstance.post("/v1/flights/search", {
         cabinClass,
         slices: finalSlices,
-        passengers: passengers.length
-          ? passengers
-          : [{ bornOn: "2000-01-01" }],
+        passengers: passengers,
       });
 
       setOffers(res || []);
