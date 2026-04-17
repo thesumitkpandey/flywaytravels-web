@@ -460,15 +460,16 @@ onClick={() => {
         {passengers.map((p, idx) => (
           <div key={idx} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
             <span className="text-xs text-gray-400 font-semibold w-4">{idx + 1}</span>
-            <DatePicker
-              variant="borderless"
-              placeholder="Date of Birth"
-              size="small"
-              className="flex-1 !p-0 !text-xs font-bold"
-              value={p.bornOn ? dayjs(p.bornOn) : null}
-              getPopupContainer={() => document.body}
-              onChange={(date) => updatePassenger(idx, { bornOn: date?.format("YYYY-MM-DD") })}
-            />
+<DatePicker
+  variant="borderless"
+  placeholder="Date of Birth"
+  size="small"
+  className="flex-1 !p-0 !text-xs font-bold"
+  value={p.bornOn ? dayjs(p.bornOn) : null}
+  getPopupContainer={() => document.body}
+  popupStyle={{ zIndex: 99999 }}
+  onChange={(date) => updatePassenger(idx, { bornOn: date?.format("YYYY-MM-DD") })}
+/>
             <Trash2
               size={13}
               className="text-gray-300 hover:text-red-400 cursor-pointer flex-shrink-0 transition-colors"
