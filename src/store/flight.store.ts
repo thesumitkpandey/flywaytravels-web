@@ -1,11 +1,12 @@
 import { create } from "zustand";
-import { passenger, cabinClass, slice } from "@/types/flight";
+import { passenger, cabinClass, slice, TripType } from "@/types/flight";
 
 type FlightState = {
     // States
     passengers: passenger[];
     cabinClass: cabinClass;
     slices: slice[];
+    tripType: TripType;
 
     // Passenger Actions
     addPassenger: (p?: Partial<passenger>) => void;
@@ -18,7 +19,7 @@ type FlightState = {
     updateSlice: (index: number, data: Partial<slice>) => void;
     removeSlice: (index: number) => void;
     setSlices: (list: slice[]) => void;
-
+    setTripType: (type: TripType) => void;
     // Cabin
     setCabinClass: (cabin: cabinClass) => void;
 
@@ -28,6 +29,7 @@ type FlightState = {
 export const useFlightStore = create<FlightState>((set) => ({
     passengers: [],
     cabinClass: "economy",
+    tripType: "oneWay",
     slices: [
         {
             origin: "NYC",
@@ -72,7 +74,7 @@ export const useFlightStore = create<FlightState>((set) => ({
                 i === index ? { ...s, ...data } : s
             ),
         })),
-
+setTripType: (type) => set({ tripType: type }),
     removeSlice: (index) =>
         set((state) => ({
             slices: state.slices.filter((_, i) => i !== index),

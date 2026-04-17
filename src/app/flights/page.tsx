@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import axiosInstance from "@/provider/axios";
 import { useState, useMemo } from "react";
+import { useFlightStore } from "@/store/flight.store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -592,7 +593,7 @@ export default function FlightResults() {
   const [offers, setOffers] = useState<FlightOffer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+const { slices, passengers, cabinClass, tripType } = useFlightStore();
   const defaultMaxPrice = 5000;
 
   const [filters, setFilters] = useState<Filters>({
@@ -604,46 +605,32 @@ export default function FlightResults() {
 
   const [sort, setSort] = useState<SortKey>("price_asc");
 
-  useEffect(() => {
-    const fetchFlights = async () => {
-      try {
-        setIsLoading(true);
+useEffect(() => {
+  const fetchFlights = async () => {
+    try {
+      setIsLoading(true);
 
-        const res = await axiosInstance.post("/v1/flights/search", {
-          cabinClass: "economy",
+      const finalSlices =
+        tripType === "oneWay" ? [slices[0]] : slices.slice(0, 2);
 
-          // ✅ FIXED: matches backend structure
-          slices: [
-            {
-              origin: "DEL",
-              destination: "BOM",
-              departureDate: "2026-05-01",
-            },
-            {
-              origin: "BOM",
-              destination: "DEL",
-              departureDate: "2026-05-10",
-            },
-          ],
+      const res = await axiosInstance.post("/v1/flights/search", {
+        cabinClass,
+        slices: finalSlices,
+        passengers: passengers.length
+          ? passengers
+          : [{ bornOn: "2000-01-01" }],
+      });
 
-          // ✅ FIXED: passengers required
-          passengers: [
-            {
-              bornOn: "2000-01-01",
-            },
-          ],
-        });
+      setOffers(res || []);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to fetch flights");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        setOffers(res || []);
-      } catch (err: any) {
-        setError(err?.response?.data?.message || "Failed to fetch flights");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFlights();
-  }, []);
+  fetchFlights();
+}, []);
 
   const effectiveMaxPrice =
     filters.maxPrice === defaultMaxPrice ? defaultMaxPrice : filters.maxPrice;

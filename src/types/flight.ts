@@ -28,3 +28,6 @@ export type Airport = {
   airportName: string;
   cityName: string;
 }
+
+export type TripType = "oneWay" | "roundTrip";
+  

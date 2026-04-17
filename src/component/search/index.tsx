@@ -19,9 +19,11 @@ const FlightSearchComponent = () => {
     addPassenger,
     removePassenger,
     updatePassenger,
+    tripType,
+    setTripType,
   } = useFlightStore();
 
-  const isRoundTrip = slices.length > 1;
+const isRoundTrip = tripType === "roundTrip";
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<"from" | "to" | null>(
     null,
@@ -59,26 +61,28 @@ const FlightSearchComponent = () => {
     const debounce = setTimeout(fetchAirports, 400);
     return () => clearTimeout(debounce);
   }, [searchQuery]);
-  console.log("these are the states", slices);
-  const handleTripTypeChange = (type: "oneWay" | "roundTrip") => {
-    if (type === "oneWay") {
-      setSlices([slices[0]]);
-    } else {
-      const firstSlice = slices[0];
-      setSlices([
-        firstSlice,
-        {
-          origin: firstSlice.destination || "",
-          destination: firstSlice.origin || "",
-          originAirportName: firstSlice.destinationAirportName || "",
-          destinationAirportName: firstSlice.originAirportName || "",
-          originAirportCity: firstSlice.destinationAirportCity || "",
-          destinationAirportCity: firstSlice.originAirportCity || "",
-          departureDate: "",
-        },
-      ]);
-    }
-  };
+const handleTripTypeChange = (type: "oneWay" | "roundTrip") => {
+  setTripType(type);
+
+  const firstSlice = slices[0];
+
+  if (type === "oneWay") {
+    setSlices([firstSlice]);
+  } else {
+    setSlices([
+      firstSlice,
+      {
+        origin: firstSlice.destination || "",
+        destination: firstSlice.origin || "",
+        originAirportName: firstSlice.destinationAirportName || "",
+        destinationAirportName: firstSlice.originAirportName || "",
+        originAirportCity: firstSlice.destinationAirportCity || "",
+        destinationAirportCity: firstSlice.originAirportCity || "",
+        departureDate: "",
+      },
+    ]);
+  }
+};
 
   const handleStartSearch = (type: "from" | "to") => {
     setActiveDropdown(type);
@@ -128,9 +132,17 @@ const FlightSearchComponent = () => {
       destinationAirportCity: s1.originAirportCity,
     });
   };
-  const handleSearchFlights = () => {
-    router.push("/flights");
-  };
+const handleSearchFlights = () => {
+  const finalSlices =
+    tripType === "oneWay" ? [slices[0]] : slices.slice(0, 2);
+
+  // optional: update store to be safe
+  setSlices(finalSlices);
+
+  console.log("FINAL SLICES", finalSlices);
+
+  router.push("/flights");
+};
   const formatLabel = (text: string) =>
     text.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
 
